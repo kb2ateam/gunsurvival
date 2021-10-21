@@ -1,11 +1,11 @@
 import Sprite from "./Sprite.js";
-import {images} from "../../globals/asset.global.js";
 
 export default class Rock extends Sprite {
+	assets = ["Rock.png"]
+
 	constructor(config = {}) {
 		config = Object.assign(
 			{
-				name: "Rock",
 				infinite: true
 			},
 			config
@@ -17,19 +17,20 @@ export default class Rock extends Sprite {
 		super.update();
 	}
 
-	render(sketch) {
+	draw(sketch) {
+		super.draw(sketch)
 		sketch.translate(this.pos.x, this.pos.y);
-		sketch.image(images["Rock.png"], 0, 0);
+		sketch.image(this.assets["Rock.png"], 0, 0);
 	}
 
-	onUpdate({pos, hideAmount, tick} = {}) {
+	onUpdate({pos} = {}) {
 		this.moveTo(pos);
 	}
 
 	getBoundary() {
 		return {
-			width: images["Rock.png"].width,
-			height: images["Rock.png"].height
+			width: this.assets["Rock.png"].width,
+			height: this.assets["Rock.png"].height
 		};
 	}
 }

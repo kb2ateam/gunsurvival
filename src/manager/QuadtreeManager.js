@@ -1,4 +1,4 @@
-import { Quadtree, Point, Rectangle, Circle } from "../helpers/Quadtree"
+import { Quadtree, Point, Rectangle, Circle } from "../universal/lib/Quadtree.js"
 
 // This is a Manager class, but not extend from ./Manager.js
 export default class QuadtreeManager {

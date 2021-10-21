@@ -1,8 +1,9 @@
+import SAT from "../lib/SAT.js"
+
 export default class Animation {
 	constructor({
 		world,
 		id, //***
-		name = "Unknown Animation",
 		liveTime = 0,
 		infinite = false,
 		visible = true,
@@ -21,7 +22,6 @@ export default class Animation {
 	} = {}) {
 		this.world = world;
 		this.id = id; // identify cho animation
-		this.name = name; // tên của animation (hiện tại đang dùng cái này để duyệt ảnh cho window.GameImages)
 		this.liveTime = liveTime; // thông số chỉ thời gian sống sót
 		this._liveTime = liveTime; // lưu trữ liveTime lại cho function this.reBorn()
 		this.infinite = infinite; // bật mode thanos éo bao giờ hết liveTime nhưng bị counter bằng this.delete()

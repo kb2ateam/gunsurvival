@@ -1,7 +1,7 @@
 import Room from "./Room.js"
 // import Sprite from "../sprites"
-import {Normal as NormalWorld} from "../world/index.js"
-import {Rectangle} from "../helpers/Quadtree.js"
+import {Normal as NormalWorld} from "../universal/world/index.js"
+import {Rectangle} from "../universal/lib/Quadtree.js"
 
 export default class Lobby extends Room {
 	constructor(options) {

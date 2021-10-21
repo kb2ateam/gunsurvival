@@ -1,49 +1,40 @@
 import Sprite from "./Sprite.js";
-import {images} from "../../globals/asset.global.js";
 
 export default class Bush extends Sprite {
+	assets = ["Bush.png"]
+	hideAmount = 0
+
 	constructor(config = {}) {
 		config = Object.assign(
 			{
-				name: "Bush",
 				infinite: true
 			},
 			config
 		);
 		super(config);
 		const {hideAmount = 0} = config;
-		this.hideAmount = hideAmount;
 		this.toggleShake = -1;
 	}
 
 	update() {
-		super.update();
-		if (this.hideAmount < 0) this.hideAmount = 0;
-		if (this.hideAmount > 0) {
-			if (this.toggleShake == -1) this.rotateTo(this.targetAngle - 1);
-			if (this.toggleShake == 1) this.rotateTo(this.targetAngle + 1);
-			if (this.angle <= this._angle - 0.12) this.toggleShake = 1;
-			if (this.angle >= this._angle + 0.12) this.toggleShake = -1;
-		} else {
-			this.rotateTo(this._angle);
-			this.speedRotate = 0.0017;
-		}
+		super.update()
 	}
 
-	render(sketch) {
-		sketch.translate(this.pos.x, this.pos.y);
-		sketch.image(images["Bush.png"], 0, 0);
+	draw(sketch) {
+		super.draw(sketch)
+		this.targetAngle = Math.PI/6 * sin(sketch.frameCount)
+		sketch.image(this.assets["Bush.png"], 0, 0)
 	}
 
-	onUpdate({pos, hideAmount, tick} = {}) {
+	onUpdate({pos, hideAmount} = {}) {
 		this.moveTo(pos);
 		this.hideAmount = hideAmount;
 	}
 
 	getBoundary() {
 		return {
-			width: images["Bush.png"].width,
-			height: images["Bush.png"].height
+			width: this.assets["Bush.png"].width,
+			height: this.assets["Bush.png"].height
 		};
 	}
 }

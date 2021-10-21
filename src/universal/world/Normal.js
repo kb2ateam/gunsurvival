@@ -1,5 +1,5 @@
 import World from "./World.js"
-import Sprite from "../sprites"
+import * as Sprite from "../animation/sprite/index.js"
 
 module.exports = class Normal extends World {
 	constructor(options) {

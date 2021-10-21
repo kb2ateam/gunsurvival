@@ -1,1 +1,1 @@
-export {default as Normal} from "../Normal.js"
+export {default as Normal} from "./Normal.js"

@@ -2,22 +2,22 @@ import serverline from "serverline"
 const completions = []
 const commands = {}
 
-export const addCompletion = completion => {
+export function addCompletion(completion) {
 	completions.push(completion)
 	serverline.setCompletion(completions)
 }
 
-export const removeCompletion = completion => {
+export function removeCompletion(completion) {
 	const index = completions.findIndex(c => c == completion)
 	if (index != -1) completions.splice(index, 1)
 	serverline.setCompletion(completions)
 }
 
-export const registerCommand = (keyword, func) => {
+export function registerCommand(keyword, func) {
 	commands[keyword] = func
 }
 
-export const init = (prefix = ">") => {
+export function init(prefix = ">") {
 	serverline.init()
 	serverline.setPrompt(prefix)
 	serverline.on("line", function (line) {

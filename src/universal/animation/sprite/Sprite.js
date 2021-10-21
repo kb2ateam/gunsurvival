@@ -22,8 +22,4 @@ export default class Sprite extends Animation {
 	onDestroy() {
 		// socket update for on destroy
 	}
-
-	update(sketch) {
-		super.update(sketch);
-	}
 }

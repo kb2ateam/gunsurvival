@@ -1,7 +1,9 @@
 import Sprite from "./Sprite.js";
-import {images} from "../../globals/asset.global.js";
 
 export default class Player extends Sprite {
+	assets = ["terrorist.png", "Gunner.png"]
+	died = false
+
 	constructor(config = {}) {
 		config = Object.assign(
 			{
@@ -11,10 +13,16 @@ export default class Player extends Sprite {
 			},
 			config
 		);
-		super(config);
-		const {name = "Unknown Player"} = config;
-		this.dead = false;
-		this.isMaster = this.id == this.world.socket.id;
+		super(config)
+		const {name = "Unknown Player"} = config
+		this.isMaster = this.id == this.world.socket.id
+	}
+
+	get rigidBody() {
+		return {
+			width: this.assets["Gunner.png"].width,
+			height: this.assets["Gunner.png"].height
+		};
 	}
 
 	update() {
@@ -22,6 +30,7 @@ export default class Player extends Sprite {
 	}
 
 	draw(sketch) {
+		super.draw(sketch)
 		if (this.isMaster)
 			this.rotateTo(
 				sketch.atan2(
@@ -37,22 +46,14 @@ export default class Player extends Sprite {
 		sketch.fill("white");
 		sketch.text(this.name, 0, -60);
 
-		const img = images["terrorist.png"];
+		const img = this.assets["terrorist.png"];
 		sketch.rotate(this.angle);
 		sketch.image(img, 0, 0, 80, 80);
 	}
 
 	onUpdate({angle, pos, tick} = {}) {
-		// debugger;
 		this.frameCount = tick;
 		!this.isMaster && this.rotateTo(angle);
 		this.moveTo(pos);
-	}
-
-	getBoundary() {
-		return {
-			width: images["Gunner.png"].width,
-			height: images["Gunner.png"].height
-		};
 	}
 }

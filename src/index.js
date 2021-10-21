@@ -8,6 +8,7 @@ import express from "express"
 import { Server } from "socket.io"
 
 import { setTerminalTitle } from "./helpers/console.js"
+import { init } from "./helpers/serverline.js"
 import Gunsurvival from "./Gunsurvival.js"
 
 const app = express()
@@ -16,6 +17,7 @@ const io = new Server(server)
 const port = process.env.PORT || 3000
 const gameServer = new Gunsurvival(io)
 gameServer.start()
+init("Gunsurvival> ")
 
 let lastTPS = 0
 setInterval(() => {
