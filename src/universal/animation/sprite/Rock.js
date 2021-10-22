@@ -1,3 +1,4 @@
+import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
 export default class Rock extends Sprite {
@@ -6,6 +7,7 @@ export default class Rock extends Sprite {
 	constructor(config = {}) {
 		config = Object.assign(
 			{
+				tag: Tag.ROCK,
 				infinite: true
 			},
 			config

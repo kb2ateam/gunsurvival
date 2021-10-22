@@ -46,6 +46,15 @@ export default class Animation {
 		this.frameCount = 0; // đếm frameCount
 	}
 
+	get plainData() {
+		return {
+			id: this.id,
+			constructorName: this.constructor.name,
+			pos: this.pos,
+			angle: this.angle
+		}
+	}
+
 	update() {
 		// update các logic của animation (position, image, status ...)
 		this.frameCount++;

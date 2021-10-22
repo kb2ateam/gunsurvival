@@ -48,6 +48,6 @@ export function init(prefix = ">") {
 	})
 
 	serverline.on("SIGINT", function (rl) {
-		rl.question("Shutdown bot? [Y/n]: ", (answer) => answer.match(/^y(es)?$/i) ? process.exit(0) : rl.output.write("\x1B[1K> "))
+		rl.question(`SHUTDOWN ${prefix.slice(0, prefix.length-1)}? [Y/n]: `, (answer) => answer.match(/^y(es)?$/i) ? process.exit(0) : rl.output.write("\x1B[1K> "))
 	})
 }

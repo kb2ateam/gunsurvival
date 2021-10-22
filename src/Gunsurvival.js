@@ -1,6 +1,6 @@
 import * as Room from "./room/index.js"
-import RoomManager from "./manager/RoomManager.js"
-import ServerConfig from "./configs/Server.js"
+import RoomManager from "./universal/manager/RoomManager.js"
+import ServerConfig from "./universal/configs/Server.js"
 
 export default class GameServer {
 	rooms = new RoomManager()

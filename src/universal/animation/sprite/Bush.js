@@ -1,3 +1,4 @@
+import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
 export default class Bush extends Sprite {
@@ -7,13 +8,12 @@ export default class Bush extends Sprite {
 	constructor(config = {}) {
 		config = Object.assign(
 			{
+				tag: Tag.BUSH,
 				infinite: true
 			},
 			config
 		);
 		super(config);
-		const {hideAmount = 0} = config;
-		this.toggleShake = -1;
 	}
 
 	update() {
@@ -22,7 +22,7 @@ export default class Bush extends Sprite {
 
 	draw(sketch) {
 		super.draw(sketch)
-		this.targetAngle = Math.PI/6 * sin(sketch.frameCount)
+		this.targetAngle = Math.PI/6 * Math.sin(sketch.frameCount)
 		sketch.image(this.assets["Bush.png"], 0, 0)
 	}
 
@@ -35,6 +35,6 @@ export default class Bush extends Sprite {
 		return {
 			width: this.assets["Bush.png"].width,
 			height: this.assets["Bush.png"].height
-		};
+		}
 	}
 }

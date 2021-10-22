@@ -33,8 +33,5 @@ setInterval(() => {
 }, 3000)
 
 app.use(express.static(path.join(dirname(), "universal")))
-app.use("/configs", express.static(path.join(dirname(), "configs")))
-app.use("/enums", express.static(path.join(dirname(), "enums")))
-app.use("/manager", express.static(path.join(dirname(), "manager")))
 
 server.listen(port, () => console.log("Server started on :*" + port))

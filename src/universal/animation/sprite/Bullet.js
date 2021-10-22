@@ -1,9 +1,11 @@
+import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
 export default class Bullet extends Sprite {
 	constructor(config = {}) {
 		config = Object.assign(
 			{
+				tag: Tag.BULLET,
 				smoothRotate: false,
 				speedRotate: 0.06,
 				speedMove: 0.2,

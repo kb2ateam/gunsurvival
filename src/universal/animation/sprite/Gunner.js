@@ -1,12 +1,15 @@
+import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
 export default class Player extends Sprite {
 	assets = ["terrorist.png", "Gunner.png"]
 	died = false
+	isMaster = false
 
 	constructor(config = {}) {
 		config = Object.assign(
 			{
+				tag: Tag.GUNNER,
 				name: "Gunner#" + config.id,
 				infinite: true,
 				speedRotate: 0.3
@@ -15,7 +18,7 @@ export default class Player extends Sprite {
 		);
 		super(config)
 		const {name = "Unknown Player"} = config
-		this.isMaster = this.id == this.world.socket.id
+		this.name = name
 	}
 
 	get rigidBody() {
@@ -31,6 +34,8 @@ export default class Player extends Sprite {
 
 	draw(sketch) {
 		super.draw(sketch)
+
+		this.isMaster = this.id == sketch.socketID
 		if (this.isMaster)
 			this.rotateTo(
 				sketch.atan2(

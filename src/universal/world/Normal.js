@@ -1,7 +1,7 @@
 import World from "./World.js"
-import * as Sprite from "../animation/sprite/index.js"
+import * as Sprites from "../animation/sprite/index.js"
 
-module.exports = class Normal extends World {
+export default class Normal extends World {
 	constructor(options) {
 		super({
 			QTSetting: {
@@ -11,7 +11,7 @@ module.exports = class Normal extends World {
 		for (let i = -2000; i < 2000; i += Math.random() * 50 + 300) {
 			for (let j = -2000; j < 2000; j += Math.random() * 50 + 300) {
 				this.add(
-					new Sprite.Rock({
+					new Sprites.Rock({
 						world: this,
 						pos: {
 							x: i,

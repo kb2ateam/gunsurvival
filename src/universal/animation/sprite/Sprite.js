@@ -9,6 +9,8 @@ export default class Sprite extends Animation {
 			config
 		);
 		super(config);
+		const {tag} = config
+		this.tag = tag || 0
 	}
 
 	onCreate() {
