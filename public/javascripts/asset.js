@@ -14,7 +14,7 @@ const GlobalAssets = {
 	images: {}
 };
 
-const loadAssets = async ({sketch, onProgress, onError, onDone}) => {
+const loadAssets = async ({ sketch, onProgress, onError, onDone }) => {
 	let loadedCount = 0;
 	let hasError = false;
 	for (const path of imagePaths) {
@@ -38,6 +38,21 @@ const loadAssets = async ({sketch, onProgress, onError, onDone}) => {
 	}
 };
 
+export function loadAssets(sketch, assetPaths) {
+	const promises = []
+	for (let i = 0; i < assetPaths.length; i++) {
+		const path = assetPaths[i]
+		promises.push(new Promise(resolve => {
+			sketch.loadImage(
+				imageDir + path,
+				resolve,
+				reject
+			);
+		}))
+	}
+	return Promise.all(promises)
+}
+
 export default GlobalAssets;
-export {GlobalAssets, loadAssets, imagePaths};
-export const {cursors, images} = GlobalAssets;
+export { GlobalAssets, loadAssets, imagePaths };
+export const { cursors, images } = GlobalAssets;

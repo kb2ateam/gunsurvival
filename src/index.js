@@ -33,5 +33,6 @@ setInterval(() => {
 }, 3000)
 
 app.use(express.static(path.join(dirname(), "universal")))
+app.use(express.static(path.join(dirname(), "../public")))
 
 server.listen(port, () => console.log("Server started on :*" + port))

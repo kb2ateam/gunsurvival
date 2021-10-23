@@ -1,4 +1,4 @@
-import SAT from "../lib/SAT.js"
+import SAT from "../libs/SAT.js"
 
 export default class Animation {
 	constructor({

@@ -5,7 +5,7 @@ import "./libs/socket.io@4.0.1.min.js";
 import "./libs/sweetalert2@11.js";
 import "./libs/SAT@0.9.0.min.js";
 // import "./libs/nanoid@3.1.22.browser.min.js";
-import * as World from "worlds/index.js";
+import * as Room from "./room/index.js";
 import Renderer from "./Renderer.js";
 
 (() => {
@@ -66,7 +66,7 @@ import Renderer from "./Renderer.js";
 			new p5(function(sketch) {
 				const renderer = new Renderer();
 				renderer.inject(sketch);
-				renderer.add(new World.Lobby({socket}));
+				renderer.add(new Room.Lobby({socket}));
 				renderer.switchTo(0);
 
 				socket.onAny(async (eventName, ...args) => {

@@ -1,8 +1,8 @@
-import SAT from "sat"
+import SAT from "../libs/SAT.js"
 import QuadtreeManager from "../manager/QuadtreeManager.js"
 import SpriteManager from "../manager/SpriteManager.js"
 import Manager from "../manager/Manager.js"
-import TagOdering from "../../configs/TagOrdering.js"
+import TagOdering from "../configs/TagOrdering.js"
 
 export default class World {
 	sprites = []

@@ -1,4 +1,4 @@
-import Manager from "./helpers/Manager.js";
+import Manager from "/manager/Manager.js";
 import {loadAssets} from "./globals/asset.global.js";
 
 const p5_functions = [
@@ -104,7 +104,8 @@ export default class Renderer extends Manager {
 			// console.log(this.tps);
 		}, 1000);
 
-		for (const func_name of p5_functions) {
+		for (let i = 0; i < p5_functions.length; i++) {
+			const func_name = p5_functions[i]
 			sketch[func_name] = (...args) => {
 				this.items[this.currentIndex][func_name] &&
 					this.items[this.currentIndex][func_name](sketch, ...args);
