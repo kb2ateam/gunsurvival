@@ -3,7 +3,7 @@ import SAT from "../libs/SAT.js"
 export default class Animation {
 	constructor({
 		world,
-		id, //***
+		id = Math.floor(Math.random() * 1e8), //***
 		liveTime = 0,
 		infinite = false,
 		visible = true,

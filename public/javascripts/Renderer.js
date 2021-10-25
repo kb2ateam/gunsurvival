@@ -1,5 +1,6 @@
-import Manager from "/manager/Manager.js";
-import {loadAssets} from "./globals/asset.global.js";
+import ServerConfig from "/configs/Server.js"
+import Manager from "/manager/Manager.js"
+import GlobalAssets, { loadAssets } from "./asset.js"
 
 const p5_functions = [
 	"mouseClicked",
@@ -21,63 +22,58 @@ const p5_functions = [
 ];
 
 export default class Renderer extends Manager {
-	constructor() {
-		super();
-		this.currentIndex = -1;
-		this.interval;
-		this.tps = 30;
-		this.tick = 0;
-	}
+	currentIndex = -1
+	tps = 30
+	tick = 0
+	interval = null
 
-	switchTo(index) {
-		if (this.items[index]) {
+	switchTo(indexOrId) {
+		const index = indexOrId
+		if (Number.isInteger(index) && index >= 0 && index < this.length) {
 			this.currentIndex = index;
-			this.items[index]._executedSetup = false;
+			this[index]._executedSetup = false;
+		} else {
+			const id = indexOrId
+			const room = this.get(id)
+			if (!room) return
+			this.currentIndex = this.indexOf(room)
+			room._executedSetup = false
 		}
 	}
 
 	inject(sketch) {
 		const getFitSize = () => {
 			let width, height;
-			const diff1 = window.innerWidth - SERVER_CONFIG.RESOLUTION.WIDTH;
-			const diff2 = window.innerHeight - SERVER_CONFIG.RESOLUTION.HEIGHT;
+			const diff1 = window.innerWidth - ServerConfig.RESOLUTION.WIDTH;
+			const diff2 = window.innerHeight - ServerConfig.RESOLUTION.HEIGHT;
 			if (diff1 < diff2) {
 				width = window.innerWidth;
 				height =
-					SERVER_CONFIG.RESOLUTION.HEIGHT *
-					(width / SERVER_CONFIG.RESOLUTION.WIDTH);
+					ServerConfig.RESOLUTION.HEIGHT *
+					(width / ServerConfig.RESOLUTION.WIDTH);
 			} else {
 				height = window.innerHeight;
 				width =
-					SERVER_CONFIG.RESOLUTION.WIDTH *
-					(height / SERVER_CONFIG.RESOLUTION.HEIGHT);
+					ServerConfig.RESOLUTION.WIDTH *
+					(height / ServerConfig.RESOLUTION.HEIGHT);
 			}
-			return {width, height};
+			return { width, height };
 		};
 
 		sketch.windowResized = () => {
 			const resolution = getFitSize();
-			const cur = this.items[this.currentIndex];
+			const cur = this[this.currentIndex];
 			sketch.resizeCanvas(resolution.width, resolution.height);
-			cur.camera.scaleTo(sketch.width / SERVER_CONFIG.RESOLUTION.WIDTH);
+			cur.camera.scaleTo(sketch.width / ServerConfig.RESOLUTION.WIDTH);
 		};
 
-		sketch.preload = () => {
-			// Sweetalert2.fire({
-			// 	title: "bruh",
-			// 	text: "loading"
-			// });
-			loadAssets({
-				sketch,
-				onProgress: () => {}
-			});
-		};
+		sketch.preload = () => {};
 
 		sketch.setup = () => {
 			const resolution = getFitSize();
 			const canv = sketch.createCanvas(resolution.width, resolution.height);
-			const cur = this.items[this.currentIndex];
-			cur.camera.scaleTo(sketch.width / SERVER_CONFIG.RESOLUTION.WIDTH);
+			const cur = this[this.currentIndex];
+			cur.camera.scaleTo(sketch.width / ServerConfig.RESOLUTION.WIDTH);
 			canv.parent("game-wrap");
 			sketch.imageMode(sketch.CENTER);
 		};
@@ -85,7 +81,7 @@ export default class Renderer extends Manager {
 		sketch.draw = () => {
 			sketch.push();
 
-			const cur = this.items[this.currentIndex];
+			const cur = this[this.currentIndex];
 			if (!cur._executedSetup) {
 				cur.setup && cur.setup(sketch);
 				cur._executedSetup = true;
@@ -101,14 +97,13 @@ export default class Renderer extends Manager {
 			if (this.tick - this.tps > this.tps / 10) this.tps += Math.round(div / 2);
 			if (this.tps - this.tick > this.tps / 10) this.tps -= Math.round(div / 2);
 			this.tick = 0;
-			// console.log(this.tps);
 		}, 1000);
 
 		for (let i = 0; i < p5_functions.length; i++) {
 			const func_name = p5_functions[i]
 			sketch[func_name] = (...args) => {
-				this.items[this.currentIndex][func_name] &&
-					this.items[this.currentIndex][func_name](sketch, ...args);
+				this[this.currentIndex][func_name] &&
+					this[this.currentIndex][func_name](sketch, ...args);
 			};
 		}
 	}

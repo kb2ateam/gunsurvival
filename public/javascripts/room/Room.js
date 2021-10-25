@@ -1,7 +1,8 @@
-import Manager from "manager/Manager.js";
-import Tag from "enums/Tag.js"
-import * as Animation from "animations/index.js";
-import Camera from "../helpers/Camera.js";
+import GlobalAssets, { loadAssets } from "../asset.js"
+import Manager from "/manager/Manager.js";
+import Tag from "/enums/Tag.js"
+import * as Sprites from "/animation/sprite/index.js";
+import Camera from "../helper/Camera.js";
 import { Normal as NormalWorld } from "/world/index.js";
 
 export default class Room {
@@ -10,6 +11,7 @@ export default class Room {
 	camera = new Camera()
 	tick = 0
 	world = new NormalWorld()
+	loadedAssets = {}
 
 	constructor({
 		socket,
@@ -28,26 +30,23 @@ export default class Room {
 			"room-join": async socketID => await this.onJoin(socketID),
 			"room-leave": async socketID => await this.onLeave(socketID),
 			"room-dispose": async reason => await this.onDispose(reason),
-			world: async data => {
+			"world": async data => {
 				for (let i = 0; i < data.length; i++) {
-					const it = data[i];
-					let sprite = this.find({ id: it.id });
+					const item = data[i]; // it = item
+					let sprite = this.world.get(item.id)
 					if (!sprite) {
-						sprite = this.add(
-							new Animation.Sprite[it.className]({
-								...it,
+						sprite = this.world[this.world.push(
+							new Sprites[item.constructorName]({
+								...item,
 								world: this
-							}), {
-								id: it.id
-							}
-						);
-						sprite.onCreate();
+							})
+						)]
 						if (sprite.id == this.socket.id) {
-							this.onSelfJoin(sprite, it);
+							this.onSelfJoin(sprite, item);
 							this.me = sprite;
 						}
 					}
-					sprite.onUpdate(it);
+					sprite.onUpdate(item);
 				}
 			}
 		};
@@ -91,22 +90,31 @@ export default class Room {
 
 	update(sketch) {
 		this.world.nextTick()
-		this.updateSketch(sketch)
-	}
-
-	updateSketch(sketch) {
 		sketch.background("#133a2b")
+		const paths = []
 		for (let i = 0; i < this.world.sprites.length; i++) {
 			const sprMgr = this.world.sprites[i]
 			for (let j = 0; j < sprMgr.length; j++) {
-				const sprite = sprMgr[i]
+				const sprite = sprMgr[j]
 				if (sprite.removed) {
 					sprMgr.remove(sprite.id)
 					j--
+					continue
 				}
-				sketch.push()
-				this.camera.update(sketch, sprite)
-				sketch.pop()
+
+				if (!this.loadedAssets[sprite.id]) {
+					const tmp = sprite.assets
+					const tmp2 = loadAssets(sketch, sprite.assets)
+					sprite.assets = {}
+					for (let l = 0; l < tmp.length; l++) {
+						sprite.assets[tmp[l]] = tmp2[l]
+					}
+					this.loadedAssets[sprite.id] = true
+				} else {
+					sketch.push()
+					this.camera.update(sketch, sprite)
+					sketch.pop()
+				}
 			}
 		}
 		this.tick++

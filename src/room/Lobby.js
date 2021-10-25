@@ -1,7 +1,10 @@
+import SAT from "sat"
+import ServerConfig from "../universal/configs/Server.js"
 import Room from "./Room.js"
-// import Sprite from "../sprites"
-import {Normal as NormalWorld} from "../universal/world/index.js"
-import {Rectangle} from "../universal/lib/Quadtree.js"
+import Tag from "../universal/enums/Tag.js"
+import Sprite, * as Sprites from "../universal/animation/sprite/index.js"
+import { Normal as NormalWorld } from "../universal/world/index.js"
+import { Rectangle } from "../universal/libs/Quadtree.js"
 
 export default class Lobby extends Room {
 	constructor(options) {
@@ -63,7 +66,7 @@ export default class Lobby extends Room {
 
 	async onJoin(socket) {
 		socket.data.currentLobby = this.id
-		const player = new Sprite.Gunner({
+		const player = new Sprites.Gunner({
 			world: this.world,
 			id: socket.id
 		})
@@ -73,13 +76,13 @@ export default class Lobby extends Room {
 	}
 
 	async onLeave(socket, consented) {
-		if (!consented && socket.data.player instanceof Sprite.Sprite)
+		if (!consented && socket.data.player instanceof Sprite)
 			return this.world.remove(socket.data.player)
 		if (
 			socket.data.currentLobby &&
 			socket.data.currentLobby != "lobby" + socket.id
 		) {
-			this.remove({id: socket.id})
+			this.remove({ id: socket.id })
 			await this.rooms["lobby" + socket.id].requestJoin(socket)
 		} else {
 			throw new Error("Bạn không thể thoát lobby của chính mình!")
@@ -87,32 +90,31 @@ export default class Lobby extends Room {
 		this.world.remove(socket.data.player)
 	}
 
-	start() {
-		this.updateInterval = setInterval(() => {
-			const gunners = this.world.getSpritesByTag("Gunner")
-			for (let i = 0; i < gunners.length; i++) {
-				const widthQ =
-					SERVER_CONFIG.RESOLUTION.WIDTH +
-					this.world.QTManager.lrgstRange * 2 +
-					50
-				const heightQ =
-					SERVER_CONFIG.RESOLUTION.HEIGHT +
-					this.world.QTManager.lrgstRange * 2 +
-					50
-				const data = this.world.QTManager.quadtree
-					.query(
-						new Rectangle(
-							gunners[i].pos.x - widthQ / 2,
-							gunners[i].pos.y - heightQ / 2,
-							widthQ,
-							heightQ
-						)
+	sendUpdates() {
+		const gunners = this.world.getSpritesByTag(Tag.GUNNER)
+		for (let i = 0; i < gunners.length; i++) {
+			const gunner = gunners[i]
+			const widthQ =
+				ServerConfig.RESOLUTION.WIDTH +
+				this.world.QTManager.lrgstRange * 2 +
+				50
+			const heightQ =
+				ServerConfig.RESOLUTION.HEIGHT +
+				this.world.QTManager.lrgstRange * 2 +
+				50
+
+			const QTManager = this.world.QTManager
+			const data = QTManager.quadtree
+				.query(
+					new Circle(
+						gunner.pos.x,
+						gunner.pos.y,
+						QTManager.lrgstRange
 					)
-					.map(p => p.userData.getMetadata())
-				gunners[i].emit("world", data)
-				// console.log(roughSizeOfObject(data))
-			}
-		}, 1000 / 20)
+				)
+				.filter(player => dist(player.pos, gunner.pos) > gunner.viewDistance && SAT.test)
+			gunner.emit("world", data)
+		}
 	}
 }
 
@@ -139,4 +141,18 @@ function roughSizeOfObject(object) {
 		}
 	}
 	return bytes
+}
+
+function dist(pos1, pos2) {
+	return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.y - pos2.y, 2))
+}
+
+function isCollide(rigid1, rigid2) {
+	const response = new SAT.Response();
+	SAT[`test${rigid1.constructor.name}${rigid2.constructor.name}`](
+		rigid1,
+		rigid2,
+		response
+	)
+	return response
 }

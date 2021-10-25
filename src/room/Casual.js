@@ -8,6 +8,4 @@ export default class Casual extends Room {
 	async onCreate() {
 		this.onMessage('change-weapon', (socket, data) => {});
 	}
-
-	nextTick() {}
 };

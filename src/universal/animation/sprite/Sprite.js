@@ -1,6 +1,8 @@
 import Animation from "../Animation.js";
 
 export default class Sprite extends Animation {
+	viewDistance = 80 * 2
+
 	constructor(config = {}) {
 		config = Object.assign(
 			{
@@ -11,6 +13,7 @@ export default class Sprite extends Animation {
 		super(config);
 		const {tag} = config
 		this.tag = tag || 0
+		this.onCreate()
 	}
 
 	onCreate() {

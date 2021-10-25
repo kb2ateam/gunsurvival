@@ -1,10 +1,3 @@
-import "./libs/jquery@3.6.0.min.js";
-import "./libs/jquery@1.19.2.validate.min.js";
-import "./libs/p5@1.3.1.min.js";
-import "./libs/socket.io@4.0.1.min.js";
-import "./libs/sweetalert2@11.js";
-import "./libs/SAT@0.9.0.min.js";
-// import "./libs/nanoid@3.1.22.browser.min.js";
 import * as Room from "./room/index.js";
 import Renderer from "./Renderer.js";
 
@@ -66,12 +59,12 @@ import Renderer from "./Renderer.js";
 			new p5(function(sketch) {
 				const renderer = new Renderer();
 				renderer.inject(sketch);
-				renderer.add(new Room.Lobby({socket}));
+				renderer.push(new Room.Lobby({socket}));
 				renderer.switchTo(0);
 
 				socket.onAny(async (eventName, ...args) => {
-					for (let i = 0; i < renderer.items.length; i++) {
-						const cb = renderer.items[i]?.onMessageHandlers[eventName];
+					for (let i = 0; i < renderer.length; i++) {
+						const cb = renderer[i]?.onMessageHandlers[eventName];
 						try {
 							if (cb) await cb(...args);
 						} catch (e) {

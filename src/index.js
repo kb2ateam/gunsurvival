@@ -17,7 +17,7 @@ const io = new Server(server)
 const port = process.env.PORT || 3000
 const gameServer = new Gunsurvival(io)
 gameServer.start()
-init("Gunsurvival> ")
+// init("Gunsurvival> ")
 
 let lastTPS = 0
 setInterval(() => {

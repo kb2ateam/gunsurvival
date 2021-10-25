@@ -1,6 +1,7 @@
 import * as Room from "./room/index.js"
 import RoomManager from "./universal/manager/RoomManager.js"
 import ServerConfig from "./universal/configs/Server.js"
+import * as logger from "./helpers/console.js"
 
 export default class GameServer {
 	rooms = new RoomManager()
@@ -14,17 +15,17 @@ export default class GameServer {
 				socket.adapter.rooms.forEach((key, roomID) => {
 					if (roomID == socket.id || // vì room id theo socket.id là sảnh chờ (built-in socket.io)
 						!this.rooms.get(roomID)) return
-					const cb = this.rooms.get(roomID).onMessageHandlers[eventName]
+					const cb = this.rooms.get(roomID).eventHandlers[eventName]
 					try {
 						if (cb) cb(socket, ...args)
 					} catch (e) {
-						console.newLogger.error(e.stack)
+						logger.error(e.stack)
 					}
 				})
 			})
 
 			socket.on("lobby-join", async () => {
-				console.newLogger.info(`Connected: ${socket.id} [ ${this.onlines()} ]`)
+				logger.info(`Connected: ${socket.id} [ ${this.onlines} ]`)
 				// const lobbyID = "lobby" + socket.id
 				const lobbyID = "lobby"
 
@@ -43,21 +44,19 @@ export default class GameServer {
 					socket.emit("lobby-join", ServerConfig)
 				} catch (e) {
 					socket.emit("error", "Lỗi!")
-					console.newLogger.error(e.stack)
+					logger.error(e.stack)
 				}
 			})
 
 			socket.on("disconnect", () => {
-				console.newLogger.info(
-					`Disconnected: ${socket.id} [ ${this.onlines()} ]`
+				logger.info(
+					`Disconnected: ${socket.id} [ ${this.onlines} ]`
 				)
-				socket.adapter.rooms.forEach((key, roomID) => {
-					const room = this.rooms.get(roomID)
-					if (room) {
-						room.onLeave(socket, false) // bị rời ko chủ động
-						room.onAnyLeave(socket)
-					}
-				})
+				for (let i = 0; i < this.rooms.length; i++) {
+					const room = this.rooms[i]
+					room.onLeave(socket, false) // bị rời ko chủ động (rớt mạng hoặc tắt tab)
+					room.onAnyLeave(socket)
+				}
 			})
 
 			socket.on("_ping", clientTime => socket.emit("pong", Number(clientTime)))
@@ -109,14 +108,13 @@ export default class GameServer {
 	}
 
 	loop() {
-		const start = performance.now()
-		this.nextTick()
+		this.performance = this.update().toFixed(2)
 		this.tick++
-		this.performance = (performance.now() - start).toFixed(2)
 		setTimeout(() => this.loop(), 1000 / 128)
 	}
 
-	nextTick() {
+	update() {
+		const start = performance.now()
 		for (let i = 0; i < this.rooms.length; i++) {
 			const room = this.rooms[i]
 			if (room.isRemoved) {
@@ -124,15 +122,17 @@ export default class GameServer {
 				--i
 				continue
 			}
-			if (room.isStarted)
+			if (!room.isPaused) {
 				room.world.nextTick()
+				room.sendUpdates()
+			}
 		}
+		return performance.now() - start
 	}
 }
 
 
 function roughSizeOfObject(object) {
-
 	var objectList = [];
 	var stack = [object];
 	var bytes = 0;

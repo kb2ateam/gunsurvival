@@ -1,2 +1,2 @@
-export * as Sprites from "./sprites/index.js"
+export * as Sprites from "./sprite/index.js"
 export {default as default} from "./Animation.js"

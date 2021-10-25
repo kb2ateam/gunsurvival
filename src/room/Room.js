@@ -1,9 +1,9 @@
 import uniqid from "uniqid"
-// import SpriteManager from "../helpers/Manager"
+import Manager from "../universal/manager/Manager.js"
 
 export default class Room {
-	id = uniqid()
-	isStarted = false
+	sockets = new Manager()
+	isPaused = true
 	isRemoved = false
 	timeCreate = Date.now()
 	eventHandlers = {
@@ -18,12 +18,14 @@ export default class Room {
 	}
 
 	constructor({
+		id = uniqid(),
 		gameServer,
 		master,
 		description = "New Game!",
 		maxPlayer = 1,
 		password = ""
 	}) {
+		this.id = id
 		this.gameServer = gameServer
 		this.master = master
 		this.description = description
@@ -59,17 +61,21 @@ export default class Room {
 		this.gameServer.io.to(this.id).emit(eventName, ...args)
 	}
 
+	sendUpdates() {
+		this.emit("world", this.world.plainData)
+	}
+
 	async requestJoin(socket, options) {
-		if (this.find({ id: socket.id }))
+		if (this.sockets.get(socket.id))
 			throw new Error("Bạn đã tham gia phòng này rồi!")
-		if (this.items.length >= this.maxPlayer) {
+		if (this.sockets.length >= this.maxPlayer) {
 			if (this.id.includes("lobby"))
 				throw new Error("Sảnh chờ quá tải, hãy thử tải lại trang!")
 			throw new Error("Phòng đã đủ số lượng người chơi!")
 		}
 		await this.onJoin(socket, options)
 		socket.join(this.id)
-		this.add(socket)
+		this.sockets.push(socket)
 	}
 
 	onMessage(eventName, cb) {
@@ -82,22 +88,22 @@ export default class Room {
 		// consented and not consented
 		this.emit("room-leave", socket.id)
 		socket.leave(this.id)
-		this.remove({ id: socket.id })
-		if (this.items.length <= 0) this.destroy()
+		this.sockets.remove(socket.id)
+		if (this.sockets.length <= 0) this.destroy()
 	}
 
 	destroy() {
-		for (let i = 0; i < this.items.length; i++) {
-			this.items[i].leave(this.id)
+		for (let i = 0; i < this.sockets.length; i++) {
+			this.sockets[i].leave(this.id)
 		}
 		this.isRemoved = true
 	}
 
 	start() {
-		this.isStarted = true
+		this.isPaused = false
 	}
 
 	pause() {
-		this.isStarted = false
+		this.isPaused = true
 	}
 }

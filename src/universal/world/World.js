@@ -1,6 +1,5 @@
 import SAT from "../libs/SAT.js"
 import QuadtreeManager from "../manager/QuadtreeManager.js"
-import SpriteManager from "../manager/SpriteManager.js"
 import Manager from "../manager/Manager.js"
 import TagOdering from "../configs/TagOrdering.js"
 
@@ -11,8 +10,15 @@ export default class World {
 	})
 	executedOCE = new Manager() // list executed on collision enter
 
-	constructor({
-	}) {
+	constructor({}) {}
+
+	get plainData() {
+		return this.sprites.map(group => group.map(sprite => sprite.plainData))
+		// for (let i = 0; i < this.sprites.length; i++) {
+		// 	for (let j = 0; j < this.sprites[i]; j++) {
+
+		// 	}
+		// }
 	}
 
 	nextTick() {
@@ -21,7 +27,8 @@ export default class World {
 			for (let j = 0; j < this.sprites[i].length; j++) {
 				const sprite = this.sprites[i][j];
 				if (sprite.removed) {
-					this.sprites[i].splice(j--, 1)
+					this.sprites.remove(sprite.id)
+					j--
 					continue;
 				}
 				sprite.update();
@@ -76,7 +83,7 @@ export default class World {
 
 	getSpritesByTag(tag) {
 		const index = TagOdering.get(tag)
-		return index ? this.sprites[index] : undefined
+		return index ? this.sprites[index] : new Manager()
 	}
 
 	add(sprite) {
@@ -84,7 +91,7 @@ export default class World {
 		if (index) {
 			this.sprites[index].push(sprite)
 		} else {
-			this.sprites.push(new SpriteManager([sprite]))
+			this.sprites.push(new Manager([sprite]))
 			TagOdering.push(sprite.tag)
 		}
 	}
@@ -127,9 +134,5 @@ export default class World {
 		return (
 			comparisonType.includes(item1.tag) || comparisonType.includes(item2.tag)
 		)
-	}
-
-	sendUpdates(room) { // server-side only
-
 	}
 }

@@ -1,4 +1,4 @@
-import Animation from "../animations/Animation.js";
+import Animation from "/animation/Animation.js";
 // import {random} from "../../helpers/common.js";
 
 export default class Camera extends Animation {
@@ -36,7 +36,7 @@ export default class Camera extends Animation {
 		) {
 			sketch.smooth();
 			animation.update();
-			animation.render(sketch);
+			animation.draw(sketch);
 		}
 	}
 
