@@ -6,6 +6,8 @@ import * as logger from "./helpers/console.js"
 export default class GameServer {
 	rooms = new RoomManager()
 	tps = 0
+	timePassed = 0
+	diff = 1000 / ServerConfig.TICKRATE
 
 	constructor(io) {
 		this.io = io
@@ -90,17 +92,6 @@ export default class GameServer {
 
 	start() {
 		this.loop()
-		this.balanceTPSInterval = setInterval(() => {
-			const div = Math.abs(this.tick - this.tps)
-			if (this.tick > this.tps && div > this.tps * 0.1) {
-				this.tps += Math.round(div / 4)
-			}
-
-			if (this.tick < this.tps && div > this.tps * 0.05) {
-				this.tps -= Math.round(div / 2)
-			}
-			this.tick = 0
-		}, 1000)
 	}
 
 	stop() {
@@ -108,9 +99,22 @@ export default class GameServer {
 	}
 
 	loop() {
-		this.performance = this.update().toFixed(2)
+		this.performance = this.update()
+		this.timePassed += this.performance + this.diff
 		this.tick++
-		setTimeout(() => this.loop(), 1000 / 128)
+		if (this.timePassed > 1000) {
+			const div = Math.abs(this.tick - this.tps)
+			if (this.tick > this.tps && div > this.tps * 0.1) {
+				this.tps += Math.round(div / 4)
+			}
+			if (this.tick < this.tps && div > this.tps * 0.05) {
+				this.tps -= Math.round(div / 2)
+			}
+			console.log("tickrate: " + this.tick, "cycle: " + this.performance.toFixed(2)+"ms")
+			this.timePassed -= 1000
+			this.tick = 0
+		}
+		setTimeout(() => this.loop(), this.diff)
 	}
 
 	update() {

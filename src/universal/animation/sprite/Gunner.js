@@ -1,10 +1,12 @@
+import SAT from "../../libs/SAT.js"
 import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
-export default class Player extends Sprite {
+export default class Gunner extends Sprite {
 	assets = ["terrorist.png", "Gunner.png"]
 	died = false
 	isMaster = false
+	QTRadius = 40
 
 	constructor(config = {}) {
 		config = Object.assign(
@@ -22,10 +24,7 @@ export default class Player extends Sprite {
 	}
 
 	get rigidBody() {
-		return {
-			width: this.assets["Gunner.png"].width,
-			height: this.assets["Gunner.png"].height
-		};
+		return new SAT.Circle(new SAT.Vector(this.pos.x, this.pos.y), 40)
 	}
 
 	update() {

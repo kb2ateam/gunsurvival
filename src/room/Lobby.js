@@ -94,26 +94,20 @@ export default class Lobby extends Room {
 		const gunners = this.world.getSpritesByTag(Tag.GUNNER)
 		for (let i = 0; i < gunners.length; i++) {
 			const gunner = gunners[i]
-			const widthQ =
-				ServerConfig.RESOLUTION.WIDTH +
-				this.world.QTManager.lrgstRange * 2 +
-				50
-			const heightQ =
-				ServerConfig.RESOLUTION.HEIGHT +
-				this.world.QTManager.lrgstRange * 2 +
-				50
-
+			const { WIDTH, HEIGHT } = ServerConfig.RESOLUTION
 			const QTManager = this.world.QTManager
-			const data = QTManager.quadtree
+			this.sockets.get(gunner.id).emit("world", QTManager.quadtree
 				.query(
-					new Circle(
-						gunner.pos.x,
-						gunner.pos.y,
-						QTManager.lrgstRange
+					new SAT.Circle(
+						new SAT.Vector(gunner.pos.x, gunner.pos.y),
+						QTManager.lrgstRadius
 					)
 				)
-				.filter(player => dist(player.pos, gunner.pos) > gunner.viewDistance && SAT.test)
-			gunner.emit("world", data)
+				.filter(sprite => {
+					const distance = dist(sprite.pos, gunner.pos)
+					return distance <= (WIDTH + HEIGHT) / 4 ||
+						(distance > gunner.QTRadius && sprite.QTRadius > gunner.QTRadius)
+				}).map(sprite => sprite.plainData))
 		}
 	}
 }
@@ -145,14 +139,4 @@ function roughSizeOfObject(object) {
 
 function dist(pos1, pos2) {
 	return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.y - pos2.y, 2))
-}
-
-function isCollide(rigid1, rigid2) {
-	const response = new SAT.Response();
-	SAT[`test${rigid1.constructor.name}${rigid2.constructor.name}`](
-		rigid1,
-		rigid2,
-		response
-	)
-	return response
 }

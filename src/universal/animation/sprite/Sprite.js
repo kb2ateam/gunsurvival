@@ -1,8 +1,6 @@
 import Animation from "../Animation.js";
 
 export default class Sprite extends Animation {
-	viewDistance = 80 * 2
-
 	constructor(config = {}) {
 		config = Object.assign(
 			{
@@ -26,5 +24,17 @@ export default class Sprite extends Animation {
 
 	onDestroy() {
 		// socket update for on destroy
+	}
+
+	onCollisionEnter() {
+
+	}
+
+	onCollisionStay() {
+
+	}
+
+	onCollisionExit() {
+		
 	}
 }

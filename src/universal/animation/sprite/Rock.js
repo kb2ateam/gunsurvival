@@ -1,3 +1,4 @@
+import SAT from "../../libs/SAT.js"
 import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
@@ -13,6 +14,10 @@ export default class Rock extends Sprite {
 			config
 		);
 		super(config);
+	}
+
+	get rigidBody() {
+		return new SAT.Circle(new SAT.Vector(this.pos.x, this.pos.y), 95)
 	}
 
 	update() {

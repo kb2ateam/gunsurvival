@@ -31,16 +31,17 @@ export default class Room {
 			"room-leave": async socketID => await this.onLeave(socketID),
 			"room-dispose": async reason => await this.onDispose(reason),
 			"world": async data => {
+				// console.log(data)
 				for (let i = 0; i < data.length; i++) {
 					const item = data[i]; // it = item
-					let sprite = this.world.get(item.id)
+					let sprite = this.world.find(item.id)
 					if (!sprite) {
 						sprite = this.world[this.world.push(
 							new Sprites[item.constructorName]({
 								...item,
 								world: this
 							})
-						)]
+						) - 1]
 						if (sprite.id == this.socket.id) {
 							this.onSelfJoin(sprite, item);
 							this.me = sprite;

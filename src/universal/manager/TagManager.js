@@ -7,16 +7,16 @@ export default class TagManager extends Manager {
 			this.push(tags[i])
 	}
 
-	get(id) {
-		const tag = super.get(id)
-		if (tag)
-			return tag.tag
+	get(tag) {
+		const tmp = super.get(tag)
+		if (tmp)
+			return tmp.index
 	}
 
 	push(tag, index = this.length) {
 		super.push({
-			id: index,
-			tag
+			id: tag,
+			index
 		})
 	}
 }

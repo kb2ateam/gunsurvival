@@ -4,7 +4,7 @@ import Manager from "../manager/Manager.js"
 import TagOdering from "../configs/TagOrdering.js"
 
 export default class World {
-	sprites = []
+	sprites = new Array(TagOdering.length).fill(new Manager())
 	QTManager = new QuadtreeManager({
 		boundary: [0, 0, 2000, 2000]
 	})
@@ -104,7 +104,7 @@ export default class World {
 	}
 
 	find(id) {
-		for (let i = 0; i < this.sprites.length; i++) {
+		for (let i = 0; i < this.sprites.length; i++) {	
 			const sprite = this.sprites[i].get(id)
 			if (sprite) return sprite
 		}

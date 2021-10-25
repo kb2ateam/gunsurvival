@@ -1,6 +1,8 @@
 import SAT from "../libs/SAT.js"
 
 export default class Animation {
+	tick = 0
+
 	constructor({
 		world,
 		id = Math.floor(Math.random() * 1e8), //***
