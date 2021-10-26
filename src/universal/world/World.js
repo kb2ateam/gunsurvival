@@ -83,12 +83,12 @@ export default class World {
 
 	getSpritesByTag(tag) {
 		const index = TagOdering.get(tag)
-		return index ? this.sprites[index] : new Manager()
+		return index != -1 ? this.sprites[index] : new Manager()
 	}
 
 	add(sprite) {
 		const index = TagOdering.get(sprite.tag)
-		if (index) {
+		if (index != -1) {
 			this.sprites[index].push(sprite)
 		} else {
 			this.sprites.push(new Manager([sprite]))
@@ -104,7 +104,7 @@ export default class World {
 	}
 
 	find(id) {
-		for (let i = 0; i < this.sprites.length; i++) {	
+		for (let i = 0; i < this.sprites.length; i++) {
 			const sprite = this.sprites[i].get(id)
 			if (sprite) return sprite
 		}

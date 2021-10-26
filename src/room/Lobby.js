@@ -1,4 +1,4 @@
-import SAT from "sat"
+import {Circle} from "../universal/libs/Quadtree.js"
 import ServerConfig from "../universal/configs/Server.js"
 import Room from "./Room.js"
 import Tag from "../universal/enums/Tag.js"
@@ -98,16 +98,17 @@ export default class Lobby extends Room {
 			const QTManager = this.world.QTManager
 			this.sockets.get(gunner.id).emit("world", QTManager.quadtree
 				.query(
-					new SAT.Circle(
-						new SAT.Vector(gunner.pos.x, gunner.pos.y),
+					new Circle(
+						gunner.pos.x,
+						gunner.pos.y,
 						QTManager.lrgstRadius
 					)
 				)
-				.filter(sprite => {
-					const distance = dist(sprite.pos, gunner.pos)
+				.filter(point => {
+					const distance = dist(point, gunner.pos)
 					return distance <= (WIDTH + HEIGHT) / 4 ||
-						(distance > gunner.QTRadius && sprite.QTRadius > gunner.QTRadius)
-				}).map(sprite => sprite.plainData))
+						(distance > gunner.QTRadius && point.userData.QTRadius > gunner.QTRadius)
+				}).map(point => point.userData.plainData))
 		}
 	}
 }
