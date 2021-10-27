@@ -27,7 +27,7 @@ export default class World {
 			for (let j = 0; j < this.sprites[i].length; j++) {
 				const sprite = this.sprites[i][j];
 				if (sprite.removed) {
-					this.sprites.remove(sprite.id)
+					this.sprites[i].remove(sprite.id)
 					j--
 					continue;
 				}
@@ -46,8 +46,8 @@ export default class World {
 				for (let k = 0; k < result.length; k++) {
 					const other = result[k].userData;
 					if (sprite == other) continue;
-					const rigid1 = sprite.rigidBody;
-					const rigid2 = other.rigidBody;
+					const rigid1 = sprite.mainRigid;
+					const rigid2 = other.mainRigid;
 					const response = new SAT.Response();
 					if (
 						SAT[`test${rigid1.constructor.name}${rigid2.constructor.name}`](

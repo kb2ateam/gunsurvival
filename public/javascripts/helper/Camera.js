@@ -3,8 +3,7 @@ import Animation from "/animation/Animation.js";
 
 export default class Camera extends Animation {
 	constructor(config = {}) {
-		config = Object.assign(
-			{
+		config = Object.assign({
 				name: "Camera"
 			},
 			config
@@ -20,24 +19,9 @@ export default class Camera extends Animation {
 		sketch.rotate(this.rotate);
 		sketch.translate(sketch.width * 0.5, sketch.height * 0.5);
 		sketch.scale(this.scale);
-		const bound = animation.getBoundary();
-		const convert = this.worldToScreen(sketch, animation.pos);
-		// debugger;
-
-		const first = convert.x + (bound.width * this.scale) / 2 >= 0;
-		const second = convert.x - (bound.width * this.scale) / 2 <= sketch.width;
-		const third = convert.y + (bound.height * this.scale) / 2 >= 0;
-		const forth = convert.y - (bound.height * this.scale) / 2 <= sketch.height;
-		if (
-			first && // r1 right edge past r2 left
-			second && // r1 left edge past r2 right
-			third && // r1 top edge past r2 bottom
-			forth // r1 bottom edge past r2 top
-		) {
-			sketch.smooth();
-			animation.update();
-			animation.draw(sketch);
-		}
+		sketch.smooth();
+		animation.update();
+		animation.draw(sketch)
 	}
 
 	shake(noise) {

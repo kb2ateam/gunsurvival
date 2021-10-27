@@ -1,10 +1,6 @@
-import {Circle} from "../universal/libs/Quadtree.js"
-import ServerConfig from "../universal/configs/Server.js"
 import Room from "./Room.js"
-import Tag from "../universal/enums/Tag.js"
 import Sprite, * as Sprites from "../universal/animation/sprite/index.js"
 import { Normal as NormalWorld } from "../universal/world/index.js"
-import { Rectangle } from "../universal/libs/Quadtree.js"
 
 export default class Lobby extends Room {
 	constructor(options) {
@@ -35,8 +31,9 @@ export default class Lobby extends Room {
 		})
 
 		this.onMessage("moving", (socket, moving = {}) => {
-			const player = socket.data.player
+			const player = this.world.find(socket.id)
 			if (!player) return
+			console.log(player.moving)
 			if (moving.up === true) player.moving.up = true
 			if (moving.down === true) player.moving.down = true
 			if (moving.left === true) player.moving.left = true
@@ -46,10 +43,11 @@ export default class Lobby extends Room {
 			if (moving.down === false) player.moving.down = false
 			if (moving.left === false) player.moving.left = false
 			if (moving.right === false) player.moving.right = false
+			console.log(player.moving)
 		})
 
 		this.onMessage("shoot", (socket, event = []) => {
-			const player = socket.data.player
+			const player = this.world.find(socket.id)
 			if (!player) return
 			const [isPressing, angle] = event
 			if (isPressing === true) player.shoot(angle)
@@ -58,9 +56,9 @@ export default class Lobby extends Room {
 		})
 
 		this.onMessage("rotate", (socket, angle = 0) => {
-			const player = socket.data.player
+			const player = this.world.find(socket.id)
 			if (!player) return
-			player.angle = angle
+			player.rotateTo(angle)
 		})
 	}
 
@@ -89,55 +87,4 @@ export default class Lobby extends Room {
 		}
 		this.world.remove(socket.data.player)
 	}
-
-	sendUpdates() {
-		const gunners = this.world.getSpritesByTag(Tag.GUNNER)
-		for (let i = 0; i < gunners.length; i++) {
-			const gunner = gunners[i]
-			const { WIDTH, HEIGHT } = ServerConfig.RESOLUTION
-			const QTManager = this.world.QTManager
-			this.sockets.get(gunner.id).emit("world", QTManager.quadtree
-				.query(
-					new Circle(
-						gunner.pos.x,
-						gunner.pos.y,
-						QTManager.lrgstRadius
-					)
-				)
-				.filter(point => {
-					const distance = dist(point, gunner.pos)
-					return distance <= (WIDTH + HEIGHT) / 4 ||
-						(distance > gunner.QTRadius && point.userData.QTRadius > gunner.QTRadius)
-				}).map(point => point.userData.plainData))
-		}
-	}
-}
-
-function roughSizeOfObject(object) {
-	var objectList = []
-	var stack = [object]
-	var bytes = 0
-
-	while (stack.length) {
-		var value = stack.pop()
-
-		if (typeof value === "boolean") {
-			bytes += 4
-		} else if (typeof value === "string") {
-			bytes += value.length * 2
-		} else if (typeof value === "number") {
-			bytes += 8
-		} else if (typeof value === "object" && objectList.indexOf(value) === -1) {
-			objectList.push(value)
-
-			for (var i in value) {
-				stack.push(value[i])
-			}
-		}
-	}
-	return bytes
-}
-
-function dist(pos1, pos2) {
-	return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.y - pos2.y, 2))
 }

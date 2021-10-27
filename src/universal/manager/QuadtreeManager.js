@@ -1,10 +1,11 @@
+import ServerConfig from "../configs/Server.js"
 import { Quadtree, Point, Rectangle, Circle } from "../libs/Quadtree.js"
 
 // This is a Manager class, but not extend from ./Manager.js
 export default class QuadtreeManager {
-	lrgstRadius = 0
+	lrgstRadius = (ServerConfig.RESOLUTION.WIDTH + ServerConfig.RESOLUTION.HEIGHT) / 4
 
-	constructor({ boundary = [0, 0, 0, 0], split = 4} = {}) {
+	constructor({ boundary = [0, 0, 0, 0], split = 4 } = {}) {
 		this.boundary = new Rectangle(...boundary)
 		this.split = split
 		this.reset()
@@ -15,12 +16,14 @@ export default class QuadtreeManager {
 	}
 
 	insert(sprite) {
-		this.quadtree.insert(new Point(sprite.pos.x, sprite.pos.y, sprite))
-		if (this.lrgstRadius < sprite.QTRadius) this.lrgstRadius = sprite.QTRadius
+		const { x, y, r } = sprite.QTRigid
+		this.quadtree.insert(new Point(x, y, sprite))
+		if (this.lrgstRadius < r) this.lrgstRadius = r
 	}
 
-	query(sprite) {
-		const {x, y} = sprite.pos
-		return this.quadtree.query(new Circle(x, y, sprite.QTRadius*2))
+	query(sprite, range) {
+		const { x, y, r } = sprite.QTRigid
+		if (!range) range = new Circle(x, y, r * 2)
+		return this.quadtree.query(range)
 	}
 }

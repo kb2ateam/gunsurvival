@@ -68,7 +68,7 @@ import Renderer from "./Renderer.js";
 						try {
 							if (cb) await cb(...args);
 						} catch (e) {
-							console.log(e);
+							console.error(e);
 						}
 					}
 				});

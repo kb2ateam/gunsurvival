@@ -8,6 +8,7 @@ export default class GameServer {
 	tps = 0
 	timePassed = 0
 	diff = 1000 / ServerConfig.TICKRATE
+	totalSent = 0
 
 	constructor(io) {
 		this.io = io
@@ -110,7 +111,7 @@ export default class GameServer {
 			if (this.tick < this.tps && div > this.tps * 0.05) {
 				this.tps -= Math.round(div / 2)
 			}
-			console.log("tickrate: " + this.tick, "cycle: " + this.performance.toFixed(2)+"ms")
+			console.log("tickrate: " + this.tick, "cycle: " + this.performance.toFixed(2)+"ms", "total sent: ", (this.totalSent/1024).toFixed(2) + "kB")
 			this.timePassed -= 1000
 			this.tick = 0
 		}

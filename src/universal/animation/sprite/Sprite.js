@@ -1,16 +1,18 @@
 import Animation from "../Animation.js";
 
 export default class Sprite extends Animation {
-	constructor(config = {}) {
-		config = Object.assign(
-			{
-				name: "Unknown Sprite"
-			},
-			config
-		);
-		super(config);
-		const {tag} = config
-		this.tag = tag || 0
+	constructor(options = {}) {
+		super({...{
+			name: "Unknown Sprite"
+		}, ...options})
+		const {
+			assets = [],
+			tag = 0
+		} = options
+		this.assets = assets
+		this.tag = tag
+		// this.rigidBody = {}
+		// this.QTRadius = 40
 		this.onCreate()
 	}
 
@@ -35,6 +37,6 @@ export default class Sprite extends Animation {
 	}
 
 	onCollisionExit() {
-		
+
 	}
 }

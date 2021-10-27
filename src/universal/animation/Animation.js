@@ -1,3 +1,4 @@
+import {Circle} from "../libs/Quadtree.js"
 import SAT from "../libs/SAT.js"
 
 export default class Animation {
@@ -46,6 +47,10 @@ export default class Animation {
 
 		this.removed = false; // removed = true thì auto bị bay ra khỏi hàng chờ vẽ animation
 		this.frameCount = 0; // đếm frameCount
+	}
+
+	get QTRigid() {
+		return new Circle(this.pos.x, this.pos.y, 40)
 	}
 
 	get plainData() {

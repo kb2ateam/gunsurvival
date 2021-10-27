@@ -1,3 +1,4 @@
+import { Rectangle } from "/libs/Quadtree.js"
 import GlobalAssets, { loadAssets } from "../asset.js"
 import Manager from "/manager/Manager.js";
 import Tag from "/enums/Tag.js"
@@ -10,7 +11,7 @@ export default class Room {
 	timeCreate = Date.now()
 	camera = new Camera()
 	tick = 0
-	world = new NormalWorld()
+	world = new NormalWorld({room: this})
 	loadedAssets = {}
 
 	constructor({
@@ -36,13 +37,13 @@ export default class Room {
 					const item = data[i]; // it = item
 					let sprite = this.world.find(item.id)
 					if (!sprite) {
-						sprite = this.world[this.world.push(
-							new Sprites[item.constructorName]({
-								...item,
-								world: this
-							})
-						) - 1]
-						if (sprite.id == this.socket.id) {
+						sprite = new Sprites[item.constructorName]({
+							...item,
+							world: this.world,
+							isMaster: item.id == this.socket.id
+						})
+						this.world.add(sprite)
+						if (sprite.isMaster) {
 							this.onSelfJoin(sprite, item);
 							this.me = sprite;
 						}
@@ -79,7 +80,7 @@ export default class Room {
 		this.camera.follow(me);
 		this.interval_rotate = setInterval(() => {
 			this.socket.emit("rotate", me.angle);
-		}, 1000 / 50);
+		}, 1000 / 30);
 	}
 
 	async onLeave(socket) {}
@@ -92,30 +93,28 @@ export default class Room {
 	update(sketch) {
 		this.world.nextTick()
 		sketch.background("#133a2b")
-		const paths = []
-		for (let i = 0; i < this.world.sprites.length; i++) {
-			const sprMgr = this.world.sprites[i]
-			for (let j = 0; j < sprMgr.length; j++) {
-				const sprite = sprMgr[j]
-				if (sprite.removed) {
-					sprMgr.remove(sprite.id)
-					j--
-					continue
-				}
+		this.world.nextTick()
 
-				if (!this.loadedAssets[sprite.id]) {
-					const tmp = sprite.assets
-					const tmp2 = loadAssets(sketch, sprite.assets)
-					sprite.assets = {}
-					for (let l = 0; l < tmp.length; l++) {
-						sprite.assets[tmp[l]] = tmp2[l]
-					}
-					this.loadedAssets[sprite.id] = true
-				} else {
-					sketch.push()
-					this.camera.update(sketch, sprite)
-					sketch.pop()
+		const worldPos = this.camera.screenToWorld(sketch, {
+			x: 0,
+			y: 0
+		})
+		const points = this.world.QTManager.quadtree.query(new Rectangle(worldPos.x, worldPos.y, sketch.width, sketch.height))
+		for (let i = 0; i < points.length; i++) {
+			const sprite = points[i].userData
+			if (!this.loadedAssets[sprite.id]) {
+				console.log(worldPos.x, worldPos.y, sketch.width, sketch.height)
+				const tmp = sprite.assets
+				const tmp2 = loadAssets(sketch, sprite.assets)
+				sprite.assets = {}
+				for (let l = 0; l < tmp.length; l++) {
+					sprite.assets[tmp[l]] = tmp2[l]
 				}
+				this.loadedAssets[sprite.id] = true
+			} else {
+				sketch.push()
+				this.camera.update(sketch, sprite)
+				sketch.pop()
 			}
 		}
 		this.tick++

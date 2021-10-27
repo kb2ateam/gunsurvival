@@ -1,3 +1,7 @@
+import sizeof from "object-sizeof"
+import { Circle } from "../universal/libs/Quadtree.js"
+import ServerConfig from "../universal/configs/Server.js"
+import Tag from "../universal/enums/Tag.js"
 import uniqid from "uniqid"
 import Manager from "../universal/manager/Manager.js"
 
@@ -61,10 +65,6 @@ export default class Room {
 		this.gameServer.io.to(this.id).emit(eventName, ...args)
 	}
 
-	sendUpdates() {
-		this.emit("world", this.world.plainData)
-	}
-
 	async requestJoin(socket, options) {
 		if (this.sockets.get(socket.id))
 			throw new Error("Bạn đã tham gia phòng này rồi!")
@@ -106,4 +106,35 @@ export default class Room {
 	pause() {
 		this.isPaused = true
 	}
+
+	sendUpdates() {
+		const gunners = this.world.getSpritesByTag(Tag.GUNNER)
+		for (let i = 0; i < gunners.length; i++) {
+			const gunner = gunners[i]
+			const { WIDTH, HEIGHT } = ServerConfig.RESOLUTION
+			const QTManager = this.world.QTManager
+			const socket = this.sockets.get(gunner.id)
+			const { x, y, r } = gunner.QTRigid
+
+			const data = QTManager.quadtree
+				.query(
+					new Circle(
+						x,
+						y,
+						QTManager.lrgstRadius
+					)
+				)
+				.filter(point => {
+					const distance = dist(point, gunner.pos)
+					return (distance <= (WIDTH + HEIGHT) / 4) || // (width + height / 2) = duong kinh duong tron noi tiep trung binh
+						(point.userData.QTRigid.r > r) // tat ca cac vat the lon 
+				}).map(point => point.userData.plainData)
+			socket && socket.emit("world", data)
+			this.gameServer.totalSent += sizeof(data)
+		}
+	}
+}
+
+function dist(pos1, pos2) {
+	return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.y - pos2.y, 2))
 }

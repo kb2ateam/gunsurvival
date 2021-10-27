@@ -1,40 +1,67 @@
+import { Circle } from "../../libs/Quadtree.js"
 import SAT from "../../libs/SAT.js"
 import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
 export default class Gunner extends Sprite {
-	assets = ["terrorist.png", "Gunner.png"]
+	moving = {
+		up: false,
+		down: false,
+		left: false,
+		right: false
+	}
 	died = false
-	isMaster = false
-	QTRadius = 40
+	speed = 3
 
-	constructor(config = {}) {
-		config = Object.assign(
-			{
+	constructor(options = {}) {
+		super({ ...{
 				tag: Tag.GUNNER,
-				name: "Gunner#" + config.id,
+				assets: ["terrorist.png", "Gunner.png"],
 				infinite: true,
 				speedRotate: 0.3
 			},
-			config
-		);
-		super(config)
-		const {name = "Unknown Player"} = config
+			...options
+		})
+		const {
+			name = "Gunner#" + options.id,
+			isMaster = false
+		} = options
 		this.name = name
+		this.isMaster = isMaster
 	}
 
-	get rigidBody() {
+	get QTRigid() {
+		return new Circle(this.pos.x, this.pos.y, 40)
+	}
+
+	get mainRigid() {
 		return new SAT.Circle(new SAT.Vector(this.pos.x, this.pos.y), 40)
+	}
+
+	shoot() {
+
+	}
+
+	stopShoot() {
+
+	}
+
+	getSpeedV() {
+		return new SAT.Vector(
+			this.moving.left ? -1 : this.moving.right ? 1 : 0,
+			this.moving.up ? -1 : this.moving.down ? 1 : 0
+		).scale(
+			(1 / Math.sqrt(2)) * this.speed * (64 / 64)
+		);
 	}
 
 	update() {
 		super.update();
+		this.targetPos.add(this.getSpeedV())
 	}
 
 	draw(sketch) {
 		super.draw(sketch)
-
-		this.isMaster = this.id == sketch.socketID
 		if (this.isMaster)
 			this.rotateTo(
 				sketch.atan2(
@@ -55,7 +82,7 @@ export default class Gunner extends Sprite {
 		sketch.image(img, 0, 0, 80, 80);
 	}
 
-	onUpdate({angle, pos, tick} = {}) {
+	onUpdate({ angle, pos, tick } = {}) {
 		this.frameCount = tick;
 		!this.isMaster && this.rotateTo(angle);
 		this.moveTo(pos);
