@@ -33,7 +33,6 @@ export default class Lobby extends Room {
 		this.onMessage("moving", (socket, moving = {}) => {
 			const player = this.world.find(socket.id)
 			if (!player) return
-			console.log(player.moving)
 			if (moving.up === true) player.moving.up = true
 			if (moving.down === true) player.moving.down = true
 			if (moving.left === true) player.moving.left = true
@@ -43,7 +42,6 @@ export default class Lobby extends Room {
 			if (moving.down === false) player.moving.down = false
 			if (moving.left === false) player.moving.left = false
 			if (moving.right === false) player.moving.right = false
-			console.log(player.moving)
 		})
 
 		this.onMessage("shoot", (socket, event = []) => {

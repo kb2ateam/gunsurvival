@@ -1,3 +1,4 @@
+import SAT from "../../libs/SAT.js"
 import Animation from "../Animation.js";
 
 export default class Sprite extends Animation {
@@ -7,13 +8,22 @@ export default class Sprite extends Animation {
 		}, ...options})
 		const {
 			assets = [],
-			tag = 0
+			tag = 0,
+			vel = {x: 0, y: 0},
+			friction = 0.9
 		} = options
 		this.assets = assets
 		this.tag = tag
-		// this.rigidBody = {}
-		// this.QTRadius = 40
+		this.vel = new SAT.Vector(vel.x, vel.y)
+		this.friction = friction
 		this.onCreate()
+	}
+
+	update() {
+		super.update()
+		this.targetPos.add(this.vel)
+		this.vel.x *= this.friction
+		this.vel.y *= this.friction
 	}
 
 	onCreate() {

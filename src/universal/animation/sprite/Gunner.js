@@ -2,6 +2,7 @@ import { Circle } from "../../libs/Quadtree.js"
 import SAT from "../../libs/SAT.js"
 import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
+import Bullet from "./Bullet.js"
 
 export default class Gunner extends Sprite {
 	moving = {
@@ -11,7 +12,7 @@ export default class Gunner extends Sprite {
 		right: false
 	}
 	died = false
-	speed = 3
+	speed = 4
 
 	constructor(options = {}) {
 		super({ ...{
@@ -39,11 +40,23 @@ export default class Gunner extends Sprite {
 	}
 
 	shoot() {
-
+		this.shootInterval = setInterval(() => {
+			this.world.add(new Bullet({
+				world: this.world,
+				vel: {
+					x: Math.cos(this.angle) * 40,
+					y: Math.sin(this.angle) * 40
+				},
+				pos: {
+					x: this.pos.x + Math.cos(this.angle) * 50,
+					y: this.pos.y + Math.sin(this.angle) * 50
+				}
+			}))
+		}, 50)
 	}
 
 	stopShoot() {
-
+		clearInterval(this.shootInterval)
 	}
 
 	getSpeedV() {
@@ -86,5 +99,18 @@ export default class Gunner extends Sprite {
 		this.frameCount = tick;
 		!this.isMaster && this.rotateTo(angle);
 		this.moveTo(pos);
+	}
+
+	onCollisionStay(other, response) {
+		switch (other.constructor.name) {
+			case "Gunner":
+			this.targetPos.sub(response.overlapV.scale(0.5))
+			break
+			case "Bullet":
+			this.targetPos.sub(response.overlapV.scale(0.5))
+			other.vel = response.overlapV
+			break
+		}
+		// console.log(this.id+other.id)
 	}
 }

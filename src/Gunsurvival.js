@@ -2,6 +2,7 @@ import * as Room from "./room/index.js"
 import RoomManager from "./universal/manager/RoomManager.js"
 import ServerConfig from "./universal/configs/Server.js"
 import * as logger from "./helpers/console.js"
+import * as Sprites from "./universal/animation/sprite/index.js"
 
 export default class GameServer {
 	rooms = new RoomManager()
@@ -32,7 +33,7 @@ export default class GameServer {
 				// const lobbyID = "lobby" + socket.id
 				const lobbyID = "lobby"
 
-				if (!this.rooms.get(lobbyID))
+				if (!this.rooms.get(lobbyID)) {
 					this.rooms.push(new Room.Lobby({
 						gameServer: this,
 						id: lobbyID,
@@ -40,6 +41,21 @@ export default class GameServer {
 						description: "My lobby",
 						maxPlayer: 5
 					}))
+					const myLobby = this.rooms.get(lobbyID)
+					for (let i = -2000; i < 2000; i += Math.random() * 50 + 300) {
+						for (let j = -2000; j < 2000; j += Math.random() * 50 + 300) {
+							myLobby.world.add(
+								new Sprites.Rock({
+									world: this,
+									pos: {
+										x: i,
+										y: j
+									}
+								})
+							)
+						}
+					}
+				}
 				const myLobby = this.rooms.get(lobbyID)
 
 				try {
@@ -111,7 +127,15 @@ export default class GameServer {
 			if (this.tick < this.tps && div > this.tps * 0.05) {
 				this.tps -= Math.round(div / 2)
 			}
-			console.log("tickrate: " + this.tick, "cycle: " + this.performance.toFixed(2)+"ms", "total sent: ", (this.totalSent/1024).toFixed(2) + "kB")
+			let count = 0
+			if (this.rooms[0]) {
+				 for (let i = 0; i < this.rooms.length; i++) {
+				 	for (let j = 0; j < this.rooms[i].world.sprites.length; j++) {
+				 		count += this.rooms[i].world.sprites[j].length
+				 	}
+				 }
+			}
+			console.log("sprites: " + count, "tickrate: " + this.tick, "cycle: " + this.performance.toFixed(2) + "ms", "avg sent: ", (this.totalSent / 1024 / this.tick).toFixed(2) + "kB")
 			this.timePassed -= 1000
 			this.tick = 0
 		}
@@ -124,7 +148,7 @@ export default class GameServer {
 			const room = this.rooms[i]
 			if (room.isRemoved) {
 				this.rooms.remove(room.id)
-				--i
+					--i
 				continue
 			}
 			if (!room.isPaused) {

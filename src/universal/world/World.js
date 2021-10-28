@@ -4,7 +4,7 @@ import Manager from "../manager/Manager.js"
 import TagOdering from "../configs/TagOrdering.js"
 
 export default class World {
-	sprites = new Array(TagOdering.length).fill(new Manager())
+	sprites = [...TagOdering.map(() => new Manager())]
 	QTManager = new QuadtreeManager({
 		boundary: [0, 0, 2000, 2000]
 	})

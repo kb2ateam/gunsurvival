@@ -3,7 +3,7 @@ import { Quadtree, Point, Rectangle, Circle } from "../libs/Quadtree.js"
 
 // This is a Manager class, but not extend from ./Manager.js
 export default class QuadtreeManager {
-	lrgstRadius = (ServerConfig.RESOLUTION.WIDTH + ServerConfig.RESOLUTION.HEIGHT) / 4
+	lrgstRadius = ServerConfig.RESOLUTION.WIDTH
 
 	constructor({ boundary = [0, 0, 0, 0], split = 4 } = {}) {
 		this.boundary = new Rectangle(...boundary)

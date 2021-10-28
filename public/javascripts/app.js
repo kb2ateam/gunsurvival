@@ -13,8 +13,8 @@ import Renderer from "./Renderer.js";
 		case "local":
 			ip = "http://localhost:3000/";
 			break;
-		case "khoakomlem":
-			ip = "https://retardcrap.hopto.org:3000/"
+		case "retardcrap":
+			ip = "http://retardcrap.hopto.org:3000/"
 			break
 		default:
 			ip = !serverQuery.includes(":") ? serverQuery + ":3000" : serverQuery;

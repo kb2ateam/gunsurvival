@@ -126,7 +126,7 @@ export default class Room {
 				)
 				.filter(point => {
 					const distance = dist(point, gunner.pos)
-					return (distance <= (WIDTH + HEIGHT) / 4) || // (width + height / 2) = duong kinh duong tron noi tiep trung binh
+					return (distance <= WIDTH/1.5) || // (width + height / 2) = duong kinh duong tron noi tiep trung binh
 						(point.userData.QTRigid.r > r) // tat ca cac vat the lon 
 				}).map(point => point.userData.plainData)
 			socket && socket.emit("world", data)

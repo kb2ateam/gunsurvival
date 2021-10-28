@@ -1,4 +1,5 @@
-import { Rectangle } from "/libs/Quadtree.js"
+import ServerConfig from "/configs/Server.js"
+import { Rectangle, Circle } from "/libs/Quadtree.js"
 import GlobalAssets, { loadAssets } from "../asset.js"
 import Manager from "/manager/Manager.js";
 import Tag from "/enums/Tag.js"
@@ -11,7 +12,7 @@ export default class Room {
 	timeCreate = Date.now()
 	camera = new Camera()
 	tick = 0
-	world = new NormalWorld({room: this})
+	world = new NormalWorld({ room: this })
 	loadedAssets = {}
 
 	constructor({
@@ -99,11 +100,23 @@ export default class Room {
 			x: 0,
 			y: 0
 		})
-		const points = this.world.QTManager.quadtree.query(new Rectangle(worldPos.x, worldPos.y, sketch.width, sketch.height))
+		const QTManager = this.world.QTManager
+		const points = QTManager.quadtree
+			.query(
+				new Circle(
+					worldPos.x,
+					worldPos.y,
+					QTManager.lrgstRadius
+				)
+			)
+			.filter(point => {
+				const distance = dist(point, worldPos)
+				return (distance <= ServerConfig.RESOLUTION.WIDTH/1.5) || // (width + height / 2) = duong kinh duong tron noi tiep trung binh
+					(point.userData.QTRigid.r > ServerConfig.RESOLUTION.WIDTH/1.5) // tat ca cac vat the lon 
+			})
 		for (let i = 0; i < points.length; i++) {
 			const sprite = points[i].userData
 			if (!this.loadedAssets[sprite.id]) {
-				console.log(worldPos.x, worldPos.y, sketch.width, sketch.height)
 				const tmp = sprite.assets
 				const tmp2 = loadAssets(sketch, sprite.assets)
 				sprite.assets = {}
@@ -119,4 +132,8 @@ export default class Room {
 		}
 		this.tick++
 	}
+}
+
+function dist(pos1, pos2) {
+	return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.y - pos2.y, 2))
 }

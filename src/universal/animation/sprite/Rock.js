@@ -7,7 +7,8 @@ export default class Rock extends Sprite {
 	constructor(options = {}) {
 		super({...{
 			tag: Tag.ROCK,
-			assets: ["Rock.png"]
+			assets: ["Rock.png"],
+			infinite: true
 		}, ...options})
 	}
 
@@ -33,10 +34,16 @@ export default class Rock extends Sprite {
 		this.moveTo(pos);
 	}
 
-	getBoundary() {
-		return {
-			width: this.assets["Rock.png"].width,
-			height: this.assets["Rock.png"].height
-		};
+	onCollisionStay(other, response) {
+		switch (other.constructor.name) {
+			case "Gunner":
+			other.targetPos.add(response.overlapV)
+			break
+			case "Bullet":
+			other.targetPos.add(response.overlapV)
+			other.vel = response.overlapV
+			break
+		}
+		// console.log(this.id+other.id)
 	}
 }

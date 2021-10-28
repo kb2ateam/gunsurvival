@@ -34,18 +34,18 @@ export default class Camera extends Animation {
 	}
 
 	// Chuyển đổi vị trí thực của vật thể (theo hệ toạ độ của mapgame) về vị trí trên màn hình (theo hệ toạ độ màn hình)
-	worldToScreen(sketch, worldPos) {
+	worldToScreen(sketch, worldPos, center = false) {
 		return {
-			x: (worldPos.x - this.pos.x) * this.scale + sketch.width * 0.5,
-			y: (worldPos.y - this.pos.y) * this.scale + sketch.height * 0.5
+			x: (worldPos.x - this.pos.x) * this.scale + sketch.width * .5 * center,
+			y: (worldPos.y - this.pos.y) * this.scale + sketch.height * .5 * center
 		};
 	}
 
 	// Ngược lại của worldToScreen()
-	screenToWorld(sketch, screenPos) {
+	screenToWorld(sketch, screenPos, center = false) {
 		return {
-			x: (screenPos.x - sketch.width * 0.5) / this.scale + this.pos.x,
-			y: (screenPos.y - sketch.height * 0.5) / this.scale + this.pos.y
+			x: (screenPos.x - sketch.width * .5 * center) / this.scale + this.pos.x,
+			y: (screenPos.y - sketch.height * .5 * center) / this.scale + this.pos.y
 		};
 	}
 }
