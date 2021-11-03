@@ -12,7 +12,7 @@ export default class Room {
 	timeCreate = Date.now()
 	camera = new Camera()
 	tick = 0
-	world = new NormalWorld({ room: this })
+	world = new NormalWorld()
 	loadedAssets = {}
 
 	constructor({
@@ -43,6 +43,9 @@ export default class Room {
 							world: this.world,
 							isMaster: item.id == this.socket.id
 						})
+						if (item.constructorName == "Bullet" && item.ownerID == this.socket.id) {
+							this.camera.shake(10)
+						}
 						this.world.add(sprite)
 						if (sprite.isMaster) {
 							this.onSelfJoin(sprite, item);
@@ -80,7 +83,7 @@ export default class Room {
 	async onSelfJoin(me, options) {
 		this.camera.follow(me);
 		this.interval_rotate = setInterval(() => {
-			this.socket.emit("rotate", me.angle);
+			this.socket.emit("rotate", me.targetAngle);
 		}, 1000 / 30);
 	}
 

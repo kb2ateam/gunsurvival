@@ -4,6 +4,7 @@ import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
 export default class Bullet extends Sprite {
+	chains = []
 	constructor(options) {
 		super({
 			...{
@@ -16,8 +17,10 @@ export default class Bullet extends Sprite {
 			},
 			...options
 		});
-		this.chains = [];
-		for (let i = 0; i < 5; i++) {
+		const { ownerID } = options
+		this.ownerID = ownerID
+		this.owner = this.world.find(ownerID)
+		for (let i = 0; i < 2; i++) {
 			this.chains.push({ x: this.pos.x, y: this.pos.y });
 		}
 	}
@@ -39,6 +42,13 @@ export default class Bullet extends Sprite {
 	get mainRigid() {
 		// WIP boundary
 		return new SAT.Circle(new SAT.Vector(this.pos.x, this.pos.y), 5)
+	}
+
+	get plainData() {
+		return {
+			...super.plainData,
+			ownerID: this.ownerID
+		}
 	}
 
 	update() {
@@ -65,18 +75,39 @@ export default class Bullet extends Sprite {
 		}
 	}
 
-	onUpdate({ pos } = {}) {
-		this.moveTo(pos);
-		this.liveTime = 40;
+	moveTo(pos) {
+		super.moveTo(pos)
+		this.chains[0].x = pos.x
+		this.chains[0].y = pos.y
 	}
 
-	onCollisionStay(other, response) {
+	onUpdate({ pos, vel } = {}) {
+		if (distance(pos, this.targetPos) > 10) {
+			this.moveTo(pos);
+			this.vel.x = vel.x
+			this.vel.y = vel.y
+		}
+
+		// this.liveTime = 40;
+	}
+
+	onCollisionEnter(other, response) {
 		switch (other.constructor.name) {
-			case "Bullet":
-			this.targetPos.sub(response.overlapV.scale(0.5))
-			other.vel = response.overlapV
-			break
+		case "Bullet":
+			{
+				const len = this.vel.len()
+				this.vel.x = this.vel.x = response.overlapV.x
+				this.vel.y = response.overlapV.y
+				this.vel.scale(len / response.overlapV.len())
+				this.vel.scale(.5)
+				break
+			}
 		}
 		// console.log(this.id+other.id)
 	}
+}
+
+
+function distance(v1, v2) {
+	return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2)
 }

@@ -1,20 +1,38 @@
+import { Circle } from "../../libs/Quadtree.js"
+import SAT from "../../libs/SAT.js"
 import Tag from "../../enums/Tag.js"
 import Sprite from "./Sprite.js";
 
 export default class Bush extends Sprite {
-	assets = ["Bush.png"]
 	hideAmount = 0
 
-	constructor(config = {}) {
-		config = Object.assign(
-			{
+	constructor(options = {}) {
+		super({
+			...{
+				assets: ["Bush.png"],
 				tag: Tag.BUSH,
 				infinite: true
 			},
-			config
-		);
-		super(config);
+			...options
+		})
 	}
+
+	get QTRigid() {
+		return new Circle(this.pos.x, this.pos.y, 60)
+	}
+
+	get mainRigid() {
+		return new SAT.Circle(new SAT.Vector(this.pos.x, this.pos.y), 60)
+	}
+
+	// get plainData() {
+	// 	return {
+	// 		...super.plainData,
+	// 		...{
+	// 			hideAmount: this.hideAmount
+	// 		}
+	// 	}
+	// }
 
 	update() {
 		super.update()
@@ -22,19 +40,22 @@ export default class Bush extends Sprite {
 
 	draw(sketch) {
 		super.draw(sketch)
-		this.targetAngle = Math.PI/6 * Math.sin(sketch.frameCount)
+		if (this.hideAmount > 0)
+			this.rotateTo(Math.PI/6 * Math.cos(Math.PI/6 * this.tick*.1))
+		else
+			this.rotateTo(0)
+		sketch.translate(this.pos.x, this.pos.y);
+		sketch.rotate(this.angle);
 		sketch.image(this.assets["Bush.png"], 0, 0)
 	}
 
-	onUpdate({pos, hideAmount} = {}) {
+	onUpdate({pos} = {}) {
 		this.moveTo(pos);
-		this.hideAmount = hideAmount;
 	}
 
-	getBoundary() {
-		return {
-			width: this.assets["Bush.png"].width,
-			height: this.assets["Bush.png"].height
-		}
+	onCollisionEnter(other, response) {
+	}
+
+	onCollisionExit(other, response) {
 	}
 }

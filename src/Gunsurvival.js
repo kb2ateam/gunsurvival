@@ -10,6 +10,7 @@ export default class GameServer {
 	timePassed = 0
 	diff = 1000 / ServerConfig.TICKRATE
 	totalSent = 0
+	tick = 0
 
 	constructor(io) {
 		this.io = io
@@ -44,15 +45,15 @@ export default class GameServer {
 					const myLobby = this.rooms.get(lobbyID)
 					for (let i = -2000; i < 2000; i += Math.random() * 50 + 300) {
 						for (let j = -2000; j < 2000; j += Math.random() * 50 + 300) {
-							myLobby.world.add(
-								new Sprites.Rock({
-									world: this,
-									pos: {
-										x: i,
-										y: j
-									}
-								})
-							)
+							let b = {
+								world: myLobby.world,
+								pos: {
+									x: i,
+									y: j
+								}
+							}
+							let a = (i > 0) ? new Sprites.Rock(b) : new Sprites.Bush(b)
+							myLobby.world.add(a)
 						}
 					}
 				}
@@ -78,7 +79,7 @@ export default class GameServer {
 				}
 			})
 
-			socket.on("_ping", clientTime => socket.emit("pong", Number(clientTime)))
+			socket.on("hello", clientTime => socket.emit("hi", Number(clientTime)))
 		})
 	}
 
@@ -129,11 +130,11 @@ export default class GameServer {
 			}
 			let count = 0
 			if (this.rooms[0]) {
-				 for (let i = 0; i < this.rooms.length; i++) {
-				 	for (let j = 0; j < this.rooms[i].world.sprites.length; j++) {
-				 		count += this.rooms[i].world.sprites[j].length
-				 	}
-				 }
+				for (let i = 0; i < this.rooms.length; i++) {
+					for (let j = 0; j < this.rooms[i].world.sprites.length; j++) {
+						count += this.rooms[i].world.sprites[j].length
+					}
+				}
 			}
 			console.log("sprites: " + count, "tickrate: " + this.tick, "cycle: " + this.performance.toFixed(2) + "ms", "avg sent: ", (this.totalSent / 1024 / this.tick).toFixed(2) + "kB")
 			this.timePassed -= 1000
@@ -158,33 +159,4 @@ export default class GameServer {
 		}
 		return performance.now() - start
 	}
-}
-
-
-function roughSizeOfObject(object) {
-	var objectList = [];
-	var stack = [object];
-	var bytes = 0;
-
-	while (stack.length) {
-		var value = stack.pop();
-
-		if (typeof value === 'boolean') {
-			bytes += 4;
-		} else if (typeof value === 'string') {
-			bytes += value.length * 2;
-		} else if (typeof value === 'number') {
-			bytes += 8;
-		} else if (
-			typeof value === 'object' &&
-			objectList.indexOf(value) === -1
-		) {
-			objectList.push(value);
-
-			for (var i in value) {
-				stack.push(value[i]);
-			}
-		}
-	}
-	return bytes;
 }

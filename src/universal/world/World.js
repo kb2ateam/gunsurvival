@@ -1,4 +1,5 @@
 import SAT from "../libs/SAT.js"
+import ServerConfig from "../configs/Server.js"
 import QuadtreeManager from "../manager/QuadtreeManager.js"
 import Manager from "../manager/Manager.js"
 import TagOdering from "../configs/TagOrdering.js"
@@ -9,6 +10,9 @@ export default class World {
 		boundary: [0, 0, 2000, 2000]
 	})
 	executedOCE = new Manager() // list executed on collision enter
+	lastUpdate = performance.now()
+	delta = 1
+	_delta = 1
 
 	constructor({}) {}
 
@@ -21,7 +25,30 @@ export default class World {
 		// }
 	}
 
+	get scaleTick() {
+		return 64 / (1000 / this.delta)
+	}
+
 	nextTick() {
+		// console.log(this.scaleTick)
+		//                         _ooOoo_      
+		//                        o8888888o
+		//                        88" . "88
+		//                        (| -_- |)
+		//                        O\  =  /O
+		//                     ____/`---'\____
+		//                   .'  \\|     |//  `.
+		//                  /  \\|||  :  |||//  \
+		//                 /  _||||| -:- |||||_  \
+		//                 |   | \\\  -  /'| |   |
+		//                 | \_|  `\`---'//  |_/ |
+		//                 \  .-\__ `-. -'__/-.  /
+		//               ___`. .'  /--.--\  `. .'___
+		//            ."" '<  `.___\_<|>_/___.' _> \"".
+		//           | | :  `- \`. ;`. _/; .'/ /  .' ; |
+		//           \  \ `-.   \_\_`. _.'_/_/  -' _.' /
+		// ===========`-.`___`-.__\ \___  /__.-'_.'_.-'================
+
 		this.QTManager.reset();
 		for (let i = 0; i < this.sprites.length; i++) {
 			for (let j = 0; j < this.sprites[i].length; j++) {
@@ -79,6 +106,8 @@ export default class World {
 				i--
 			}
 		}
+		this.delta = performance.now() - this._delta
+		this._delta = performance.now()
 	}
 
 	getSpritesByTag(tag) {

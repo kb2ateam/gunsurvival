@@ -2,6 +2,7 @@ import * as Room from "./room/index.js";
 import Renderer from "./Renderer.js";
 
 (() => {
+	globalThis.isClient = true
 	const urlParams = new URLSearchParams(window.location.search);
 	const serverQuery = urlParams.get("server") || "local";
 	let ip = "";
@@ -46,11 +47,16 @@ import Renderer from "./Renderer.js";
 			// 	allowEscapeKey: false
 			// });
 			socket.emit("lobby-join");
-			socket.emit("_ping", Date.now());
+			socket.emit("hello", Date.now());
 		});
 
-		socket.on("pong", timeSent => {
-			socket.emit("_ping", Date.now());
+		socket.on("hi", timeSent => {
+			const latency = Date.now() - timeSent
+			$("#ping").html(latency)
+
+			setTimeout(() => {
+				socket.emit("hello", Date.now());
+			}, 1000)
 		});
 
 		socket.on("lobby-join", SERVER_CONFIG => {

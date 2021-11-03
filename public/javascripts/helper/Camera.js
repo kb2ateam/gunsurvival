@@ -10,6 +10,7 @@ export default class Camera extends Animation {
 		);
 		super(config);
 		this.isShaking = false;
+		this.speedMove = 0.01
 		// this.prefix = new SAT.Vector();
 	}
 
@@ -26,11 +27,8 @@ export default class Camera extends Animation {
 
 	shake(noise) {
 		if (this.isShaking) return;
-		let cX = this.pos.x; // current X
-		let cY = this.pos.y; // current Y
-		// let random = [-1, 1][Random(0, 1, true)];
-		this.pos.x = cX + random(-noise, noise);
-		this.pos.y = cY + random(-noise, noise);
+		this.pos.x = this.pos.x + random(-noise, noise);
+		this.pos.y = this.pos.y + random(-noise, noise);
 	}
 
 	// Chuyển đổi vị trí thực của vật thể (theo hệ toạ độ của mapgame) về vị trí trên màn hình (theo hệ toạ độ màn hình)
@@ -48,4 +46,10 @@ export default class Camera extends Animation {
 			y: (screenPos.y - sketch.height * .5 * center) / this.scale + this.pos.y
 		};
 	}
+}
+
+function random(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
