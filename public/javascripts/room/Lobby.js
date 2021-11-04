@@ -5,15 +5,19 @@ export default class Lobby extends Room {
 		switch (sketch.key.toLowerCase()) {
 		case "w":
 			this.socket.emit("moving", { up: true });
+			if (this.me) this.me.moving.up = true
 			break;
 		case "s":
 			this.socket.emit("moving", { down: true });
+			if (this.me) this.me.moving.down = true
 			break;
 		case "a":
 			this.socket.emit("moving", { left: true });
+			if (this.me) this.me.moving.left = true
 			break;
 		case "d":
 			this.socket.emit("moving", { right: true });
+			if (this.me) this.me.moving.right = true
 			break;
 		}
 	}
@@ -22,15 +26,19 @@ export default class Lobby extends Room {
 		switch (sketch.key.toLowerCase()) {
 		case "w":
 			this.socket.emit("moving", { up: false });
+			if (this.me) this.me.moving.up = false
 			break;
 		case "s":
 			this.socket.emit("moving", { down: false });
+			if (this.me) this.me.moving.down = false
 			break;
 		case "a":
 			this.socket.emit("moving", { left: false });
+			if (this.me) this.me.moving.left = false
 			break;
 		case "d":
 			this.socket.emit("moving", { right: false });
+			if (this.me) this.me.moving.right = false
 			break;
 		}
 	}

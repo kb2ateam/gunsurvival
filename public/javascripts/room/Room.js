@@ -14,6 +14,7 @@ export default class Room {
 	tick = 0
 	world = new NormalWorld()
 	loadedAssets = {}
+	me = null
 
 	constructor({
 		socket,

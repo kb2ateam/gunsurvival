@@ -23,6 +23,9 @@ export default class Bullet extends Sprite {
 		for (let i = 0; i < 2; i++) {
 			this.chains.push({ x: this.pos.x, y: this.pos.y });
 		}
+		setTimeout(() => {
+			this.destroy()
+		}, 3000)
 	}
 
 	get QTRigid() {

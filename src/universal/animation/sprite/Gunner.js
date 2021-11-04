@@ -12,7 +12,9 @@ export default class Gunner extends Sprite {
 		right: false
 	}
 	died = false
+	baseSpeed = 6
 	speed = 6
+	blood = 100
 
 	constructor(options = {}) {
 		super({ ...{
@@ -39,6 +41,13 @@ export default class Gunner extends Sprite {
 		return new SAT.Circle(new SAT.Vector(this.pos.x, this.pos.y), 40)
 	}
 
+	get plainData() {
+		return {
+			...super.plainData,
+			blood: this.blood
+		}
+	}
+
 	shoot() {
 		this.shootInterval = setInterval(() => {
 			this.world.add(new Bullet({
@@ -53,7 +62,7 @@ export default class Gunner extends Sprite {
 					y: this.pos.y + Math.sin(this.angle) * 50
 				}
 			}))
-		}, 50)
+		}, 100)
 	}
 
 	stopShoot() {
@@ -107,10 +116,25 @@ export default class Gunner extends Sprite {
 		}
 	}
 
-	onUpdate({ angle, pos, tick } = {}) {
+	onUpdate({ angle, pos, blood, tick } = {}) {
 		this.frameCount = tick;
-		!this.isMaster && this.rotateTo(angle);
-		this.moveTo(pos);
+		if (!this.isMaster) {
+			this.rotateTo(angle);
+			this.moveTo(pos);
+		} else {
+			if (distance(pos, this.pos) > 50)
+				this.moveTo(pos);
+		}
+		if (blood == 100) {
+			this.name = `${Math.floor(blood)}`
+		} else
+		if (this.blood != blood) {
+			this.name = `${Math.floor(blood)} [-${Math.floor(this.blood - blood)}]`
+			this.blood = blood
+		}
+		if (blood <= 0) {
+			this.destroy()
+		}
 	}
 
 	onCollisionStay(other, response) {
@@ -130,25 +154,27 @@ export default class Gunner extends Sprite {
 	onCollisionEnter(other, response) {
 		switch (other.constructor.name) {
 		case "Gunner":
-			// this.targetPos.sub(response.overlapV.scale(0.5))
-			console.log(this.id)
+			this.targetPos.sub(response.overlapV.scale(0.5))
 			break
 		case "Bush":
 			other.hideAmount++
-			this.baseSpeed = other.speed
 			this.speed *= 0.5
 			this.visible = false
 			break
 		case "Bullet":
 			{
 				if (other.ownerID == this.id) break
-				const baseSpeed = 7
-				clearTimeout(this.slowDown)
 				this.speed = 2
 				this.slowDown = setTimeout(() => {
-					this.speed = baseSpeed
+					this.speed = this.baseSpeed
 				}, 1000)
-				// this.blood -= other.vel.len() / 2
+				this.blood -= other.vel.len() / 2
+				if (this.blood <= 0) {
+					this.targetPos.x = -600 + Math.random()*1200
+					this.targetPos.y = -600 + Math.random()*1200
+					this.blood = 100
+				}
+				other.destroy()
 				break
 			}
 		}
@@ -158,10 +184,19 @@ export default class Gunner extends Sprite {
 		switch (other.constructor.name) {
 		case "Bush":
 			other.hideAmount--
-			this.speed = other.baseSpeed || 8
+			this.speed = this.baseSpeed
 			this.visible = true
 			break
 		}
-		// console.log(this.id+other.id)
 	}
+}
+
+function distance(v1, v2) {
+	return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2)
+}
+
+function lerp(value1, value2, amount) {
+	amount = amount < 0 ? 0 : amount
+	amount = amount > 1 ? 1 : amount
+	return value1 + (value2 - value1) * amount
 }
