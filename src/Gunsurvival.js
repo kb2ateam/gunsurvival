@@ -136,7 +136,7 @@ export default class GameServer {
 					}
 				}
 			}
-			console.log("sprites: " + count, "tickrate: " + this.tick, "cycle: " + this.performance.toFixed(2) + "ms", "avg sent: ", (this.totalSent / 1024 / this.tick).toFixed(2) + "kB")
+			console.log("sprites: " + count, "tickrate: " + this.tick, "cycle: " + this.performance.toFixed(2) + "ms", "avg sent: ", (this.totalSent / 1024).toFixed(2) + "kB")
 			this.timePassed -= 1000
 			this.tick = 0
 		}

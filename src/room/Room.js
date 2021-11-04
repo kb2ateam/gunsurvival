@@ -131,6 +131,9 @@ export default class Room {
 				}).map(point => point.userData.plainData)
 			socket && socket.emit("world", data)
 			this.gameServer.totalSent += sizeof(data)
+			if (sizeof(data) <= 0) {
+				console.log(sizeof(data))
+			}
 		}
 	}
 }

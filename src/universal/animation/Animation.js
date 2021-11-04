@@ -13,7 +13,7 @@ export default class Animation {
 		// vị trí
 		pos = {x: 0, y: 0},
 		smoothMove = globalThis.isClient ? true : false,
-		speedMove = 0.1,
+		speedMove = 0.08,
 		// phóng to/nhỏ
 		scale = 1,
 		smoothScale = true,

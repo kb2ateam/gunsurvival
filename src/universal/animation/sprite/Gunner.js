@@ -122,7 +122,7 @@ export default class Gunner extends Sprite {
 			this.rotateTo(angle);
 			this.moveTo(pos);
 		} else {
-			if (distance(pos, this.pos) > 50)
+			
 				this.moveTo(pos);
 		}
 		if (blood == 100) {
