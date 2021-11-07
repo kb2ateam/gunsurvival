@@ -23,8 +23,6 @@ const p5_functions = [
 
 export default class Renderer extends Manager {
 	currentIndex = -1
-	tps = 30
-	tick = 0
 	interval = null
 
 	switchTo(indexOrId) {
@@ -89,15 +87,7 @@ export default class Renderer extends Manager {
 			cur.update && cur.update(sketch);
 
 			sketch.pop();
-			this.tick++;
 		};
-
-		this.interval = setInterval(() => {
-			const div = Math.abs(this.tick - this.tps);
-			if (this.tick - this.tps > this.tps / 10) this.tps += Math.round(div / 2);
-			if (this.tps - this.tick > this.tps / 10) this.tps -= Math.round(div / 2);
-			this.tick = 0;
-		}, 1000);
 
 		for (let i = 0; i < p5_functions.length; i++) {
 			const func_name = p5_functions[i]

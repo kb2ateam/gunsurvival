@@ -20,11 +20,13 @@
   },
   "homepage": "https://github.com/kb2ateam/gunsurvival#readme",
   "dependencies": {
+    "colyseus": "^0.14.23",
     "dotenv": "^10.0.0",
     "es-dirname": "^0.1.0",
     "express": "^4.17.1",
     "object-path": "^0.11.8",
     "object-sizeof": "^1.6.1",
+    "pixi-viewport": "^4.34.0",
     "quadratic-roots": "^1.0.0",
     "sat": "^0.9.0",
     "serverline": "^1.5.0",

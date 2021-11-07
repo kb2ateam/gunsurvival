@@ -4,14 +4,15 @@ import GlobalAssets, { loadAssets } from "../asset.js"
 import Manager from "/manager/Manager.js";
 import Tag from "/enums/Tag.js"
 import * as Sprites from "/animation/sprite/index.js";
-import Camera from "../helper/Camera.js";
+import Camera from "../helpers/Camera.js";
 import { Normal as NormalWorld } from "/world/index.js";
 
-export default class Room {
+const {PIXI} = globalThis
+
+export default class Room extends PIXI.scenes.SceneManager {
 	id = globalThis.uniqid()
 	timeCreate = Date.now()
 	camera = new Camera()
-	tick = 0
 	world = new NormalWorld()
 	loadedAssets = {}
 	me = null
@@ -23,6 +24,7 @@ export default class Room {
 		maxPlayer = 1,
 		password = ""
 	} = {}) {
+		super()
 		this.socket = socket;
 		this.master = master;
 		this.description = description;
@@ -95,12 +97,20 @@ export default class Room {
 		this.deleted = true;
 	}
 
-	update(sketch) {
-		this.world.nextTick()
-		sketch.background("#133a2b")
+	// ==-- PIXI SCENCE --==
+	init() {
+
+	}
+
+	start() {
+
+	}
+
+	update(delta) {
+		// sketch.background("#133a2b")
 		this.world.nextTick()
 
-		const worldPos = this.camera.screenToWorld(sketch, {
+		const worldPos = this.camera.screenToWorld(this, {
 			x: 0,
 			y: 0
 		})
@@ -122,19 +132,14 @@ export default class Room {
 			const sprite = points[i].userData
 			if (!this.loadedAssets[sprite.id]) {
 				const tmp = sprite.assets
-				const tmp2 = loadAssets(sketch, sprite.assets)
 				sprite.assets = {}
 				for (let l = 0; l < tmp.length; l++) {
-					sprite.assets[tmp[l]] = tmp2[l]
+					sprite.assets[tmp[l]] = PIXI.Texture.from("/images/"+tmp[l])
 				}
 				this.loadedAssets[sprite.id] = true
-			} else {
-				sketch.push()
-				this.camera.update(sketch, sprite)
-				sketch.pop()
+				// this.addChild()
 			}
 		}
-		this.tick++
 	}
 }
 
